@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#030308">
+  <title>Aetherfall: Nexus Protocol</title>
 
+  <!-- Premium Sci-Fi Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Teko:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- High-End SVG Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css?v=12">
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+  <!-- Background Effects -->
+  <canvas id="particles-canvas"></canvas>
+  <div class="scanline"></div>
+
+  <!-- ═══ ZONE A: TOP HUD ═══ -->
+  <header class="zone-header">
+    <div class="profile-hud">
+      <div class="level-badge"><span>10</span></div>
+      <div class="profile-info">
+        <span class="commander-name" id="user-name">COMMANDER</span>
+        <div class="xp-bar-bg"><div class="xp-bar-fill" style="width: 65%;"></div></div>
+      </div>
+    </div>
+    
+    <div class="resource-hud">
+      <div class="res-pill">
+        <div class="res-icon-box cyan"><img src="assets/icon_gem.jpg" onerror="this.src='https://via.placeholder.com/30/00f3ff/000000?text=💎'"></div>
+        <span class="res-value" id="gems-value">50</span>
+      </div>
+      <div class="res-pill">
+        <div class="res-icon-box yellow"><img src="assets/icon_energy.jpg" onerror="this.src='https://via.placeholder.com/30/fce205/000000?text=⚡'"></div>
+        <span class="res-value" id="credits-value">1000</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ ZONE B: MAIN CONTENT ═══ -->
+  <main id="app-main" class="zone-main">
+    <!-- JS dynamically loads content here -->
+  </main>
+
+  <!-- ═══ ZONE C: BOTTOM NAVIGATION ═══ -->
+  <nav class="zone-nav">
+    <button class="nav-btn active" data-view="outpost">
+      <img src="assets/nav_outpost.jpg" class="nav-img-icon" onerror="this.src='https://via.placeholder.com/30/00f3ff/000000?text=O'">
+      <span class="nav-label">Outpost</span>
+    </button>
+    <button class="nav-btn" data-view="armory">
+      <img src="assets/nav_armory.jpg" class="nav-img-icon" onerror="this.src='https://via.placeholder.com/30/00f3ff/000000?text=A'">
+      <span class="nav-label">Armory</span>
+    </button>
+    <button class="nav-btn" data-view="sector">
+      <img src="assets/nav_sector.jpg" class="nav-img-icon" onerror="this.src='https://via.placeholder.com/30/00f3ff/000000?text=S'">
+      <span class="nav-label">Sector</span>
+    </button>
+    <button class="nav-btn" data-view="arena">
+      <img src="assets/nav_arena.jpg" class="nav-img-icon" onerror="this.src='https://via.placeholder.com/30/ff00ff/000000?text=Ar'">
+      <span class="nav-label">Arena</span>
+    </button>
+    <button class="nav-btn" data-view="market">
+      <img src="assets/nav_market.jpg" class="nav-img-icon" onerror="this.src='https://via.placeholder.com/30/00f3ff/000000?text=M'">
+      <span class="nav-label">Market</span>
+    </button>
+  </nav>
+
+  <!-- Loading Screen -->
+  <div id="loading-overlay" class="loading-overlay">
+    <img src="assets/logo.jpg" style="width: 200px; filter: drop-shadow(0 0 20px var(--cyan));" onerror="this.style.display='none'">
+    <div class="loading-text">INITIALIZING NEXUS...</div>
+    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+  </div>
+
+  <script src="app.js?v=12"></script>
+</body>
+</html>
