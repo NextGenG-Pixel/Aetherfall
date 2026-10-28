@@ -1,12 +1,16 @@
 // ================================================
-// AETHERFALL: NEXUS PROTOCOL - CORE ENGINE (v12)
+// AETHERFALL: NEXUS PROTOCOL - CORE ENGINE (v13)
 // ================================================
 
 const tg = window.Telegram.WebApp;
 let playerName = "COMMANDER";
-if (tg) { tg.ready(); tg.expand(); if (tg.initDataUnsafe?.user) playerName = tg.initDataUnsafe.user.first_name || "COMMANDER"; }
+if (tg) { 
+  tg.ready(); 
+  tg.expand(); 
+  if (tg.initDataUnsafe?.user) playerName = tg.initDataUnsafe.user.first_name || "COMMANDER"; 
+}
 
-// 🧠 ১. গেমের মডুলার ডাটাবেস (ভবিষ্যতে এখানে নতুন আইটেম যোগ করবে)
+// 🧠 ১. গেমের মডুলার ডাটাবেস
 const GAME_DATABASE = {
   character: [
     { id: 'char_default', name: 'Cadet', basePower: 100, image: 'char_default.jpg' },
@@ -39,25 +43,22 @@ let userState = {
   credits: 1000,
   equipped: {
     character: 'char_default',
-    weapon: 'wep_rifle_normal', // Normal tier for start
-    pet: null,
-    vehicle: null,
-    armor: null
+    weapon: 'wep_rifle_normal',
+    pet: 'pet_dog_normal',
+    vehicle: 'veh_bike_normal',
+    armor: 'arm_vest_normal'
   }
 };
 
-// 🧮 ৩. পাওয়ার ক্যালকুলেশন লজিক (Base Power × Rarity Multiplier × Level)
+// 🧮 ৩. পাওয়ার ক্যালকুলেশন লজিক
 function calculatePower(baseItemId, rarity = 'normal', level = 1) {
   let basePower = 100;
-  // ডাটাবেস থেকে বেস পাওয়ার খোঁজা
   for (const category in GAME_DATABASE) {
     const found = GAME_DATABASE[category].find(i => i.id === baseItemId);
     if (found) { basePower = found.basePower; break; }
   }
-
   const rarityMultipliers = { normal: 1, epic: 1.5, legendary: 2.5, mythic: 5 };
   const multiplier = rarityMultipliers[rarity] || 1;
-  
   return Math.floor(basePower * multiplier * level);
 }
 
@@ -65,8 +66,8 @@ function calculatePower(baseItemId, rarity = 'normal', level = 1) {
 function renderView(viewName) {
   const main = document.getElementById('app-main');
   
-    if (viewName === 'outpost') {
-    document.body.classList.add('outpost-view'); // ব্যাকগ্রাউন্ড ম্যাপ অন করা
+  if (viewName === 'outpost') {
+    document.body.classList.add('outpost-view'); 
     
     let totalPower = calculatePower(userState.equipped.character, 'normal', 1);
     
@@ -75,14 +76,11 @@ function renderView(viewName) {
         <h1 class="total-power-display">POWER: ${totalPower.toLocaleString()}</h1>
         
         <div class="character-area">
-          <!-- Glowing Tech Rings -->
           <div class="tech-ring"></div>
           <div class="character-pedestal"></div>
           
-          <!-- Character Image (Black background removed via CSS) -->
           <img src="assets/${userState.equipped.character}.jpg" class="main-character" onerror="this.src='https://via.placeholder.com/250/000000/00f3ff?text=CHARACTER'">
           
-          <!-- HUD Slots -->
           <div class="hud-slot slot-weapon"><img src="assets/${userState.equipped.weapon || 'wep_rifle_normal'}.jpg" onerror="this.style.display='none'"></div>
           <div class="hud-slot slot-pet"><img src="assets/${userState.equipped.pet || 'pet_dog_normal'}.jpg" onerror="this.style.display='none'"></div>
           <div class="hud-slot slot-vehicle"><img src="assets/${userState.equipped.vehicle || 'veh_bike_normal'}.jpg" onerror="this.style.display='none'"></div>
@@ -92,17 +90,15 @@ function renderView(viewName) {
         <button class="collect-btn">COLLECT IDLE RESOURCES</button>
       </div>
     `;
-  } else {
-    document.body.classList.remove('outpost-view'); // অন্য পেজে গেলে ম্যাপ সরানো
-    // ... (বাকি কোড আগের মতোই থাকবে)
+  } 
   
   else if (viewName === 'armory') {
-    // আর্মারি ভিউ (Inventory Grid)
+    document.body.classList.remove('outpost-view');
+    
     main.innerHTML = `
       <div class="fade-in">
         <h1 class="view-title neon-glow-cyan" style="font-size: 20px; margin-bottom: 15px;">ARMORY</h1>
         
-        <!-- Tabs -->
         <div class="armory-tabs">
           <button class="tab-btn active">Weapons</button>
           <button class="tab-btn">Armor</button>
@@ -110,9 +106,7 @@ function renderView(viewName) {
           <button class="tab-btn">Vehicles</button>
         </div>
 
-        <!-- Inventory Grid -->
         <div class="inventory-grid">
-          <!-- Demo Item 1 -->
           <div class="item-card card-normal">
             <span class="item-level">Lvl 1</span>
             <img src="assets/wep_rifle_normal.jpg" onerror="this.src='https://via.placeholder.com/80/000000/fff?text=Item'">
@@ -121,7 +115,6 @@ function renderView(viewName) {
             <button class="equip-btn" onclick="equipItem('wep_rifle_normal')">EQUIP</button>
           </div>
 
-          <!-- Demo Item 2 -->
           <div class="item-card card-epic">
             <span class="item-level">Lvl 5</span>
             <img src="assets/wep_rifle_epic.jpg" onerror="this.src='https://via.placeholder.com/80/000000/00f3ff?text=Item'">
@@ -132,10 +125,10 @@ function renderView(viewName) {
         </div>
       </div>
     `;
-  }
+  } 
   
   else {
-    // অন্যান্য ভিউ (Sector, Arena, Market) - প্লেসহোল্ডার
+    document.body.classList.remove('outpost-view');
     main.innerHTML = `
       <div class="fade-in" style="text-align: center; margin-top: 50px;">
         <h1 class="view-title neon-glow-cyan">${viewName.toUpperCase()}</h1>
@@ -145,19 +138,15 @@ function renderView(viewName) {
   }
 }
 
-// 🛠️ ৫. ইকুইপ ফাংশন (লজিক)
+// 🛠️ ৫. ইকুইপ ফাংশন
 window.equipItem = function(itemId) {
-  // আইডি থেকে রেয়ারিটি বের করা (যেমন: wep_rifle_epic থেকে epic)
-  const parts = itemId.split('_');
-  const rarity = parts[parts.length - 1];
-  
-  if (itemId.includes('wep_')) {
-    userState.equipped.weapon = itemId;
-  }
+  if (itemId.includes('wep_')) userState.equipped.weapon = itemId;
+  if (itemId.includes('pet_')) userState.equipped.pet = itemId;
+  if (itemId.includes('arm_')) userState.equipped.armor = itemId;
+  if (itemId.includes('veh_')) userState.equipped.vehicle = itemId;
   
   if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
   
-  // আউটপোস্টে ফিরে গিয়ে আপডেট দেখানো
   renderView('outpost');
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelector('[data-view="outpost"]').classList.add('active');
@@ -175,7 +164,6 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 
 // ৭. গেম স্টার্ট
 document.addEventListener('DOMContentLoaded', () => {
-  // পার্টিকেল ইফেক্ট (ব্যাকগ্রাউন্ডের জন্য)
   const canvas = document.getElementById('particles-canvas');
   if(canvas) {
     const ctx = canvas.getContext('2d');
@@ -185,10 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
     draw();
   }
 
-  // লোডিং স্ক্রিন সরানো
   setTimeout(() => {
     document.getElementById('loading-overlay').classList.add('hidden');
     document.getElementById('user-name').innerText = userState.name.toUpperCase();
     renderView('outpost');
   }, 1500);
-}); 
+});
