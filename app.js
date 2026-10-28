@@ -65,30 +65,36 @@ function calculatePower(baseItemId, rarity = 'normal', level = 1) {
 function renderView(viewName) {
   const main = document.getElementById('app-main');
   
-  if (viewName === 'outpost') {
-    // ক্যারেক্টারের মোট পাওয়ার বের করা
-    let totalPower = calculatePower(userState.equipped.character, 'normal', 1); // ডিফল্ট ক্যারেক্টার
+    if (viewName === 'outpost') {
+    document.body.classList.add('outpost-view'); // ব্যাকগ্রাউন্ড ম্যাপ অন করা
     
-    // আউটপোস্ট HTML
+    let totalPower = calculatePower(userState.equipped.character, 'normal', 1);
+    
     main.innerHTML = `
       <div class="outpost-container fade-in">
-        <h1 class="total-power-display">TOTAL POWER: ${totalPower.toLocaleString()}</h1>
+        <h1 class="total-power-display">POWER: ${totalPower.toLocaleString()}</h1>
         
         <div class="character-area">
-          <!-- Character Image -->
+          <!-- Glowing Tech Rings -->
+          <div class="tech-ring"></div>
+          <div class="character-pedestal"></div>
+          
+          <!-- Character Image (Black background removed via CSS) -->
           <img src="assets/${userState.equipped.character}.jpg" class="main-character" onerror="this.src='https://via.placeholder.com/250/000000/00f3ff?text=CHARACTER'">
           
           <!-- HUD Slots -->
-          <div class="hud-slot slot-weapon"><img src="assets/${userState.equipped.weapon || 'wep_rifle_normal'}.jpg" onerror="this.src='https://via.placeholder.com/40/000000/00f3ff?text=W'"></div>
-          <div class="hud-slot slot-pet"><img src="assets/${userState.equipped.pet || 'pet_dog_normal'}.jpg" onerror="this.src='https://via.placeholder.com/40/000000/ff00ff?text=P'"></div>
-          <div class="hud-slot slot-vehicle"><img src="assets/${userState.equipped.vehicle || 'veh_bike_normal'}.jpg" onerror="this.src='https://via.placeholder.com/40/000000/fce205?text=V'"></div>
-          <div class="hud-slot slot-armor"><img src="assets/${userState.equipped.armor || 'arm_vest_normal'}.jpg" onerror="this.src='https://via.placeholder.com/40/000000/22c55e?text=A'"></div>
+          <div class="hud-slot slot-weapon"><img src="assets/${userState.equipped.weapon || 'wep_rifle_normal'}.jpg" onerror="this.style.display='none'"></div>
+          <div class="hud-slot slot-pet"><img src="assets/${userState.equipped.pet || 'pet_dog_normal'}.jpg" onerror="this.style.display='none'"></div>
+          <div class="hud-slot slot-vehicle"><img src="assets/${userState.equipped.vehicle || 'veh_bike_normal'}.jpg" onerror="this.style.display='none'"></div>
+          <div class="hud-slot slot-armor"><img src="assets/${userState.equipped.armor || 'arm_vest_normal'}.jpg" onerror="this.style.display='none'"></div>
         </div>
 
         <button class="collect-btn">COLLECT IDLE RESOURCES</button>
       </div>
     `;
-  } 
+  } else {
+    document.body.classList.remove('outpost-view'); // অন্য পেজে গেলে ম্যাপ সরানো
+    // ... (বাকি কোড আগের মতোই থাকবে)
   
   else if (viewName === 'armory') {
     // আর্মারি ভিউ (Inventory Grid)
@@ -185,4 +191,4 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('user-name').innerText = userState.name.toUpperCase();
     renderView('outpost');
   }, 1500);
-});
+}); 
