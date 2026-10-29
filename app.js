@@ -1,78 +1,50 @@
-// Telegram Init
 if (window.Telegram) { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); }
 
-// 1. STATE MANAGEMENT (নতুন ইউজার - শুধু Normal আনলকড)
 let user = {
-  power: 150,
-  gems: 50,
-  iron: 1000,
-  plasma: 10,
-  equipped: {
-    char: 'char_default',
-    weapon: 'wep_rifle_normal',
-    pet: 'pet_dog_normal',
-    armor: 'arm_vest_normal'
-  },
-  unlockedItems: ['char_default', 'wep_rifle_normal', 'pet_dog_normal', 'arm_vest_normal']
+  gems: 50, iron: 1000, plasma: 5,
+  equipped: { char: 'char_default', weapon: 'wep_rifle_normal', pet: 'pet_dog_normal' },
+  unlockedItems: ['char_default', 'wep_rifle_normal', 'pet_dog_normal']
 };
 
-// সব আইটেমের ডাটাবেস
 const allGameItems = [
-  // Characters
   { id: 'char_default', name: 'Cadet', type: 'char', rarity: 'normal', power: 100 },
   { id: 'char_epic', name: 'Cyber Ninja', type: 'char', rarity: 'epic', power: 500 },
-  { id: 'char_legendary', name: 'Warlord', type: 'char', rarity: 'legendary', power: 1500 },
-  // Weapons
   { id: 'wep_rifle_normal', name: 'Std Rifle', type: 'weapon', rarity: 'normal', power: 50 },
   { id: 'wep_rifle_epic', name: 'Plasma Rifle', type: 'weapon', rarity: 'epic', power: 300 },
-  { id: 'wep_rifle_legendary', name: 'Nova Blaster', type: 'weapon', rarity: 'legendary', power: 800 },
-  // Pets
   { id: 'pet_dog_normal', name: 'Cyber Dog', type: 'pet', rarity: 'normal', power: 50 },
-  { id: 'pet_tiger_epic', name: 'Mecha Tiger', type: 'pet', rarity: 'epic', power: 400 },
-  { id: 'pet_dragon_legendary', name: 'Mecha Dragon', type: 'pet', rarity: 'legendary', power: 1000 },
-  // Armor
-  { id: 'arm_vest_normal', name: 'Basic Vest', type: 'armor', rarity: 'normal', power: 50 },
-  { id: 'arm_vest_mythic', name: 'Titan Armor', type: 'armor', rarity: 'mythic', power: 2000 }
+  { id: 'pet_dragon_legendary', name: 'Mecha Dragon', type: 'pet', rarity: 'legendary', power: 1000 }
 ];
 
 let selectedItem = null;
 
-// 2. INITIALIZATION
 window.onload = () => {
-  setTimeout(() => { 
-    document.getElementById('loading').classList.add('hide'); 
-    updateUI(); 
-  }, 1500);
+  setTimeout(() => { document.getElementById('loading').classList.add('hide'); updateUI(); }, 1500);
 };
 
-// 3. UI UPDATER
 function updateUI() {
-  // Update Resources
   document.getElementById('ui-gems').innerText = user.gems;
   document.getElementById('ui-iron').innerText = user.iron;
   document.getElementById('ui-pc').innerText = user.plasma;
   
-  // Calculate Total Power
   let total = 0;
   for (let type in user.equipped) {
     let item = allGameItems.find(i => i.id === user.equipped[type]);
     if(item) total += item.power;
   }
-  user.power = total;
-  document.getElementById('ui-total-power').innerText = `POWER: ${user.power}`;
+  document.getElementById('ui-total-power').innerText = `POWER: ${total}`;
   
-  // Update Outpost HUD Slots
+  // Set Home Slots
   document.getElementById('ui-slot-wep').src = `assets/${user.equipped.weapon}.png`;
   document.getElementById('ui-slot-pet').src = `assets/${user.equipped.pet}.png`;
 
-  // Update Battle Screen Images (Dynamic Loading)
+  // Set Arena Fighters dynamically
+  const charRarity = user.equipped.char.split('_').pop(); 
   document.getElementById('p-char-img').src = `assets/${user.equipped.char}_left.png`;
   document.getElementById('p-pet-img').src = `assets/${user.equipped.pet}_attack.png`;
 
   renderArmory();
 }
 
-// 4. NAVIGATION
 function nav(screenId, btnElement) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
@@ -83,7 +55,6 @@ function nav(screenId, btnElement) {
   if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
 }
 
-// 5. ARMORY & LOCK/UNLOCK LOGIC
 function renderArmory() {
   const grid = document.getElementById('ui-inventory');
   grid.innerHTML = allGameItems.map(item => {
@@ -97,9 +68,9 @@ function renderArmory() {
     return `
       <div class="item-card ${cardClass}" onclick="handleItemClick('${item.id}')">
         ${lockIcon}
-        <img src="assets/${item.id}.png" onerror="this.src='https://via.placeholder.com/80/333/fff?text=?'">
-        <div class="name" style="font-family:'Orbitron'; font-size:12px;">${item.name}</div>
-        <div class="power" style="color:var(--gold); font-family:'Teko'; font-size:18px;">${item.power} PWR</div>
+        <img src="assets/${item.id}.png" onerror="this.src='https://via.placeholder.com/90/333/fff?text=?'">
+        <div class="name">${item.name}</div>
+        <div class="power">${item.power} PWR</div>
         ${equippedText}
       </div>
     `;
@@ -111,7 +82,6 @@ function handleItemClick(id) {
   const isUnlocked = user.unlockedItems.includes(id);
   
   if (!isUnlocked) {
-    // Show Unlock Modal
     selectedItem = item;
     document.getElementById('upgrade-modal').style.display = 'flex';
     document.getElementById('modal-img').src = `assets/${id}.png`;
@@ -122,10 +92,8 @@ function handleItemClick(id) {
     btn.innerText = "UNLOCK NOW";
     btn.onclick = unlockItem;
   } else {
-    // Equip directly
     user.equipped[item.type] = item.id;
     updateUI();
-    if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
   }
 }
 
@@ -136,14 +104,13 @@ function unlockItem() {
     user.unlockedItems.push(selectedItem.id);
     updateUI();
   } else {
-    alert("Not enough materials! Go defeat bosses in the Sector.");
+    alert("Not enough materials!");
   }
   closeModal();
 }
 
 function closeModal() { document.getElementById('upgrade-modal').style.display = 'none'; }
 
-// 6. PVP BATTLE LOGIC (Dynamic + Pets)
 let isFighting = false, pHpVal = 100, eHpVal = 100;
 
 function startBattle() {
@@ -163,10 +130,8 @@ function startBattle() {
     const ePet = document.getElementById('e-pet-img');
 
     if(turn % 2 !== 0) {
-      // Player Attack
       pChar.classList.add('attack-l');
       pPet.classList.add('pet-lunge-left');
-      
       setTimeout(() => {
         pChar.classList.remove('attack-l');
         eChar.classList.add('shake');
@@ -175,12 +140,9 @@ function startBattle() {
         setTimeout(() => eChar.classList.remove('shake'), 300);
       }, 200);
       setTimeout(() => { pPet.classList.remove('pet-lunge-left'); }, 800);
-
     } else {
-      // Enemy Attack
       eChar.classList.add('attack-r');
       ePet.classList.add('pet-lunge-right');
-      
       setTimeout(() => {
         eChar.classList.remove('attack-r');
         pChar.classList.add('shake');
@@ -204,7 +166,6 @@ function startBattle() {
   }, 1000);
 }
 
-// 7. PVE BOSS LOGIC
 function fightBoss() {
   let bossHp = 5000;
   const btn = document.getElementById('btn-boss');
@@ -223,7 +184,6 @@ function fightBoss() {
   }, 400);
 }
 
-// Helper: Damage Numbers
 function showDamage(target, amount) {
   const rect = target.getBoundingClientRect();
   const dmg = document.createElement('div');
