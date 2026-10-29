@@ -1,131 +1,235 @@
-console.log("Aetherfall Engine Starting...");
+// Telegram Init
+if (window.Telegram) { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); }
 
-const tg = window.Telegram.WebApp;
-let playerName = "COMMANDER";
-if (tg) { 
-  tg.ready(); 
-  tg.expand(); 
-  if (tg.initDataUnsafe?.user) playerName = tg.initDataUnsafe.user.first_name || "COMMANDER"; 
-}
-
-const GAME_DATABASE = {
-  character: [
-    { id: 'char_default', name: 'Cadet', basePower: 100 },
-    { id: 'char_epic', name: 'Cyber Ninja', basePower: 500 },
-    { id: 'char_legendary', name: 'Warlord', basePower: 1500 },
-    { id: 'char_mythic', name: 'Cosmic God', basePower: 5000 }
-  ],
-  weapon: [{ id: 'wep_rifle', basePower: 100 }, { id: 'wep_sword', basePower: 150 }, { id: 'wep_cannon', basePower: 300 }],
-  pet: [{ id: 'pet_dog', basePower: 50 }, { id: 'pet_dragon', basePower: 500 }],
-  vehicle: [{ id: 'veh_bike', basePower: 200 }],
-  armor: [{ id: 'arm_vest', basePower: 50 }, { id: 'arm_helmet', basePower: 50 }]
-};
-
-let userState = {
-  name: playerName,
+// 1. STATE MANAGEMENT (নতুন ইউজার - শুধু Normal আনলকড)
+let user = {
+  power: 150,
   gems: 50,
-  credits: 1000,
+  iron: 1000,
+  plasma: 10,
   equipped: {
-    character: 'char_default',
+    char: 'char_default',
     weapon: 'wep_rifle_normal',
     pet: 'pet_dog_normal',
-    vehicle: 'veh_bike_normal',
     armor: 'arm_vest_normal'
-  }
+  },
+  unlockedItems: ['char_default', 'wep_rifle_normal', 'pet_dog_normal', 'arm_vest_normal']
 };
 
-function calculatePower(baseItemId, rarity = 'normal', level = 1) {
-  let basePower = 100;
-  for (const category in GAME_DATABASE) {
-    const found = GAME_DATABASE[category].find(i => i.id === baseItemId);
-    if (found) { basePower = found.basePower; break; }
-  }
-  const rarityMultipliers = { normal: 1, epic: 1.5, legendary: 2.5, mythic: 5 };
-  return Math.floor(basePower * (rarityMultipliers[rarity] || 1) * level);
-}
+// সব আইটেমের ডাটাবেস
+const allGameItems = [
+  // Characters
+  { id: 'char_default', name: 'Cadet', type: 'char', rarity: 'normal', power: 100 },
+  { id: 'char_epic', name: 'Cyber Ninja', type: 'char', rarity: 'epic', power: 500 },
+  { id: 'char_legendary', name: 'Warlord', type: 'char', rarity: 'legendary', power: 1500 },
+  // Weapons
+  { id: 'wep_rifle_normal', name: 'Std Rifle', type: 'weapon', rarity: 'normal', power: 50 },
+  { id: 'wep_rifle_epic', name: 'Plasma Rifle', type: 'weapon', rarity: 'epic', power: 300 },
+  { id: 'wep_rifle_legendary', name: 'Nova Blaster', type: 'weapon', rarity: 'legendary', power: 800 },
+  // Pets
+  { id: 'pet_dog_normal', name: 'Cyber Dog', type: 'pet', rarity: 'normal', power: 50 },
+  { id: 'pet_tiger_epic', name: 'Mecha Tiger', type: 'pet', rarity: 'epic', power: 400 },
+  { id: 'pet_dragon_legendary', name: 'Mecha Dragon', type: 'pet', rarity: 'legendary', power: 1000 },
+  // Armor
+  { id: 'arm_vest_normal', name: 'Basic Vest', type: 'armor', rarity: 'normal', power: 50 },
+  { id: 'arm_vest_mythic', name: 'Titan Armor', type: 'armor', rarity: 'mythic', power: 2000 }
+];
 
-function renderView(viewName) {
-  const main = document.getElementById('app-main');
-  
-  if (viewName === 'outpost') {
-    document.body.classList.add('outpost-view'); 
-    let totalPower = calculatePower(userState.equipped.character, 'normal', 1);
-    
-    main.innerHTML = `
-      <div class="outpost-container fade-in">
-        <h1 class="total-power-display">POWER: ${totalPower.toLocaleString()}</h1>
-        <div class="character-area">
-          <div class="tech-ring"></div>
-          <div class="character-pedestal"></div>
-          <img src="assets/${userState.equipped.character}.jpg" class="main-character" onerror="this.src='https://via.placeholder.com/250/000000/00f3ff?text=CHARACTER'">
-          <div class="hud-slot slot-weapon"><img src="assets/${userState.equipped.weapon}.jpg" onerror="this.style.display='none'"></div>
-          <div class="hud-slot slot-pet"><img src="assets/${userState.equipped.pet}.jpg" onerror="this.style.display='none'"></div>
-          <div class="hud-slot slot-vehicle"><img src="assets/${userState.equipped.vehicle}.jpg" onerror="this.style.display='none'"></div>
-          <div class="hud-slot slot-armor"><img src="assets/${userState.equipped.armor}.jpg" onerror="this.style.display='none'"></div>
-        </div>
-        <button class="collect-btn">COLLECT IDLE RESOURCES</button>
-      </div>
-    `;
-  } else if (viewName === 'armory') {
-    document.body.classList.remove('outpost-view');
-    main.innerHTML = `
-      <div class="fade-in">
-        <h1 class="view-title neon-glow-cyan" style="font-size: 20px; margin-bottom: 15px;">ARMORY</h1>
-        <div class="armory-tabs">
-          <button class="tab-btn active">Weapons</button>
-          <button class="tab-btn">Armor</button>
-        </div>
-        <div class="inventory-grid">
-          <div class="item-card card-normal">
-            <img src="assets/wep_rifle_normal.jpg" onerror="this.src='https://via.placeholder.com/80/000000/fff?text=Item'">
-            <p class="item-name">Plasma Rifle</p>
-            <p class="item-power">${calculatePower('wep_rifle', 'normal', 1)} PWR</p>
-            <button class="equip-btn" onclick="equipItem('wep_rifle_normal')">EQUIP</button>
-          </div>
-          <div class="item-card card-epic">
-            <img src="assets/wep_rifle_epic.jpg" onerror="this.src='https://via.placeholder.com/80/000000/00f3ff?text=Item'">
-            <p class="item-name">Plasma Rifle</p>
-            <p class="item-power">${calculatePower('wep_rifle', 'epic', 5)} PWR</p>
-            <button class="equip-btn" onclick="equipItem('wep_rifle_epic')">EQUIP</button>
-          </div>
-        </div>
-      </div>
-    `;
-  } else {
-    document.body.classList.remove('outpost-view');
-    main.innerHTML = `<div class="fade-in" style="text-align: center; margin-top: 50px;"><h1 class="view-title neon-glow-cyan">${viewName.toUpperCase()}</h1><p>Coming Soon...</p></div>`;
-  }
-}
+let selectedItem = null;
 
-window.equipItem = function(itemId) {
-  if (itemId.includes('wep_')) userState.equipped.weapon = itemId;
-  if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-  renderView('outpost');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('[data-view="outpost"]').classList.add('active');
-}
-
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    e.currentTarget.classList.add('active');
-    renderView(e.currentTarget.getAttribute('data-view'));
-  });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.getElementById('particles-canvas');
-  if(canvas) {
-    const ctx = canvas.getContext('2d');
-    let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
-    let particles = Array(40).fill().map(() => ({ x: Math.random()*w, y: Math.random()*h, r: Math.random()*2, s: Math.random()*0.5 }));
-    function draw() { ctx.clearRect(0,0,w,h); ctx.fillStyle = '#00f3ff'; particles.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); p.y -= p.s; if(p.y<0) p.y=h; }); requestAnimationFrame(draw); }
-    draw();
-  }
-
-  setTimeout(() => {
-    document.getElementById('loading-overlay').classList.add('hidden');
-    document.getElementById('user-name').innerText = userState.name.toUpperCase();
-    renderView('outpost');
+// 2. INITIALIZATION
+window.onload = () => {
+  setTimeout(() => { 
+    document.getElementById('loading').classList.add('hide'); 
+    updateUI(); 
   }, 1500);
-});
+};
+
+// 3. UI UPDATER
+function updateUI() {
+  // Update Resources
+  document.getElementById('ui-gems').innerText = user.gems;
+  document.getElementById('ui-iron').innerText = user.iron;
+  document.getElementById('ui-pc').innerText = user.plasma;
+  
+  // Calculate Total Power
+  let total = 0;
+  for (let type in user.equipped) {
+    let item = allGameItems.find(i => i.id === user.equipped[type]);
+    if(item) total += item.power;
+  }
+  user.power = total;
+  document.getElementById('ui-total-power').innerText = `POWER: ${user.power}`;
+  
+  // Update Outpost HUD Slots
+  document.getElementById('ui-slot-wep').src = `assets/${user.equipped.weapon}.png`;
+  document.getElementById('ui-slot-pet').src = `assets/${user.equipped.pet}.png`;
+
+  // Update Battle Screen Images (Dynamic Loading)
+  document.getElementById('p-char-img').src = `assets/${user.equipped.char}_left.png`;
+  document.getElementById('p-pet-img').src = `assets/${user.equipped.pet}_attack.png`;
+
+  renderArmory();
+}
+
+// 4. NAVIGATION
+function nav(screenId, btnElement) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  if(btnElement) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btnElement.classList.add('active');
+  }
+  if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+}
+
+// 5. ARMORY & LOCK/UNLOCK LOGIC
+function renderArmory() {
+  const grid = document.getElementById('ui-inventory');
+  grid.innerHTML = allGameItems.map(item => {
+    const isUnlocked = user.unlockedItems.includes(item.id);
+    const isEquipped = user.equipped[item.type] === item.id;
+    
+    let cardClass = isUnlocked ? `card-${item.rarity}` : 'card-locked';
+    let lockIcon = isUnlocked ? '' : '<i class="ph-fill ph-lock-key lock-icon"></i>';
+    let equippedText = isEquipped ? '<div style="color:var(--green); font-size:10px; font-weight:bold; margin-top:5px;">EQUIPPED</div>' : '';
+    
+    return `
+      <div class="item-card ${cardClass}" onclick="handleItemClick('${item.id}')">
+        ${lockIcon}
+        <img src="assets/${item.id}.png" onerror="this.src='https://via.placeholder.com/80/333/fff?text=?'">
+        <div class="name" style="font-family:'Orbitron'; font-size:12px;">${item.name}</div>
+        <div class="power" style="color:var(--gold); font-family:'Teko'; font-size:18px;">${item.power} PWR</div>
+        ${equippedText}
+      </div>
+    `;
+  }).join('');
+}
+
+function handleItemClick(id) {
+  const item = allGameItems.find(i => i.id === id);
+  const isUnlocked = user.unlockedItems.includes(id);
+  
+  if (!isUnlocked) {
+    // Show Unlock Modal
+    selectedItem = item;
+    document.getElementById('upgrade-modal').style.display = 'flex';
+    document.getElementById('modal-img').src = `assets/${id}.png`;
+    document.getElementById('modal-title').innerText = `UNLOCK ${item.name.toUpperCase()}`;
+    document.getElementById('modal-desc').innerHTML = `Cost: <span style="color:gold;">500 Iron + 2 Plasma</span>`;
+    
+    let btn = document.getElementById('btn-modal-action');
+    btn.innerText = "UNLOCK NOW";
+    btn.onclick = unlockItem;
+  } else {
+    // Equip directly
+    user.equipped[item.type] = item.id;
+    updateUI();
+    if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+  }
+}
+
+function unlockItem() {
+  if(user.iron >= 500 && user.plasma >= 2) {
+    user.iron -= 500;
+    user.plasma -= 2;
+    user.unlockedItems.push(selectedItem.id);
+    updateUI();
+  } else {
+    alert("Not enough materials! Go defeat bosses in the Sector.");
+  }
+  closeModal();
+}
+
+function closeModal() { document.getElementById('upgrade-modal').style.display = 'none'; }
+
+// 6. PVP BATTLE LOGIC (Dynamic + Pets)
+let isFighting = false, pHpVal = 100, eHpVal = 100;
+
+function startBattle() {
+  if(isFighting) return;
+  isFighting = true;
+  pHpVal = 100; eHpVal = 100;
+  document.getElementById('p-hp').style.width = '100%';
+  document.getElementById('e-hp').style.width = '100%';
+  document.getElementById('btn-fight').innerText = "FIGHTING...";
+
+  let turn = 0;
+  const fightLoop = setInterval(() => {
+    turn++;
+    const pChar = document.getElementById('p-char-img');
+    const eChar = document.getElementById('e-char-img');
+    const pPet = document.getElementById('p-pet-img');
+    const ePet = document.getElementById('e-pet-img');
+
+    if(turn % 2 !== 0) {
+      // Player Attack
+      pChar.classList.add('attack-l');
+      pPet.classList.add('pet-lunge-left');
+      
+      setTimeout(() => {
+        pChar.classList.remove('attack-l');
+        eChar.classList.add('shake');
+        eHpVal -= 25; document.getElementById('e-hp').style.width = `${Math.max(0, eHpVal)}%`;
+        showDamage(eChar, 2500);
+        setTimeout(() => eChar.classList.remove('shake'), 300);
+      }, 200);
+      setTimeout(() => { pPet.classList.remove('pet-lunge-left'); }, 800);
+
+    } else {
+      // Enemy Attack
+      eChar.classList.add('attack-r');
+      ePet.classList.add('pet-lunge-right');
+      
+      setTimeout(() => {
+        eChar.classList.remove('attack-r');
+        pChar.classList.add('shake');
+        pHpVal -= 20; document.getElementById('p-hp').style.width = `${Math.max(0, pHpVal)}%`;
+        showDamage(pChar, 2000);
+        setTimeout(() => pChar.classList.remove('shake'), 300);
+      }, 200);
+      setTimeout(() => { ePet.classList.remove('pet-lunge-right'); }, 800);
+    }
+
+    if(pHpVal <= 0 || eHpVal <= 0) {
+      clearInterval(fightLoop);
+      setTimeout(() => {
+        if(eHpVal <= 0) { user.iron += 200; alert("VICTORY! +200 Iron"); }
+        else { alert("DEFEAT!"); }
+        updateUI();
+        isFighting = false; document.getElementById('btn-fight').innerText = "START ATTACK";
+        nav('outpost', document.querySelectorAll('.nav-btn')[0]);
+      }, 500);
+    }
+  }, 1000);
+}
+
+// 7. PVE BOSS LOGIC
+function fightBoss() {
+  let bossHp = 5000;
+  const btn = document.getElementById('btn-boss');
+  if(btn.innerText === "FIGHTING...") return;
+  btn.innerText = "FIGHTING...";
+  
+  let damage = setInterval(() => {
+    bossHp -= 500;
+    document.getElementById('boss-hp').style.width = `${(bossHp/5000)*100}%`;
+    if(bossHp <= 0) {
+      clearInterval(damage);
+      alert("Boss Defeated! +1000 Iron, +1 Plasma Core");
+      user.iron += 1000; user.plasma += 1;
+      updateUI(); btn.innerText = "ATTACK BOSS";
+    }
+  }, 400);
+}
+
+// Helper: Damage Numbers
+function showDamage(target, amount) {
+  const rect = target.getBoundingClientRect();
+  const dmg = document.createElement('div');
+  dmg.classList.add('dmg-text'); dmg.innerText = `-${amount}`;
+  dmg.style.left = `${rect.left + (rect.width/2) - 20}px`; 
+  dmg.style.top = `${rect.top}px`;
+  document.body.appendChild(dmg); 
+  setTimeout(() => dmg.remove(), 1000);
+}
