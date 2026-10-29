@@ -6,7 +6,7 @@
   <title>Aetherfall: Nexus Protocol</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <link rel="stylesheet" href="style.css?v=3.0">
+  <link rel="stylesheet" href="style.css?v=4.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -19,9 +19,9 @@
 
   <!-- TOP HUD -->
   <div class="top-hud" id="global-hud">
-    <div class="res-pill"><img src="assets/icon_gem.jpg" onerror="this.src='https://via.placeholder.com/20/00f3ff'"> <span id="ui-gems">50</span></div>
-    <div class="res-pill"><img src="assets/token_iron.jpg" onerror="this.src='https://via.placeholder.com/20/888'"> <span id="ui-iron">500</span></div>
-    <div class="res-pill"><img src="assets/token_plasmacore.jpg" onerror="this.src='https://via.placeholder.com/20/f0f'"> <span id="ui-pc">5</span></div>
+    <div class="res-pill"><img src="assets/icon_gem.png" onerror="this.src='https://via.placeholder.com/20/00f3ff'"> <span id="ui-gems">50</span></div>
+    <div class="res-pill"><img src="assets/token_iron.png" onerror="this.src='https://via.placeholder.com/20/888'"> <span id="ui-iron">1000</span></div>
+    <div class="res-pill"><img src="assets/token_plasmacore.png" onerror="this.src='https://via.placeholder.com/20/f0f'"> <span id="ui-pc">5</span></div>
   </div>
 
   <!-- 1. OUTPOST -->
@@ -31,9 +31,9 @@
     <div class="outpost-content">
       <h1 class="total-power" id="ui-total-power">POWER: 0</h1>
       <div class="char-area">
-        <img src="assets/char_default.png" class="main-char" id="ui-main-char" onerror="this.src='https://via.placeholder.com/250/000000/00f3ff?text=CHAR'">
-        <div class="hud-slot slot-w"><img id="ui-slot-wep" src=""></div>
-        <div class="hud-slot slot-p"><img id="ui-slot-pet" src=""></div>
+        <img src="assets/char_default.png" class="main-char" id="ui-main-char">
+        <div class="hud-slot slot-w"><img id="ui-slot-wep" src="assets/wep_rifle_normal.png"></div>
+        <div class="hud-slot slot-p"><img id="ui-slot-pet" src="assets/pet_dog_normal.png"></div>
       </div>
       <div class="action-area">
         <button class="btn btn-magenta" onclick="nav('arena', this)">FIGHT (PVP)</button>
@@ -46,12 +46,7 @@
   <div class="screen" id="armory">
     <div class="bg" style="background-image: url('assets/bg_page.jpg');"></div>
     <div class="bg-overlay"></div>
-    <div class="armory-tabs">
-      <div class="tab active">Inventory</div>
-    </div>
-    <div class="inventory-grid" id="ui-inventory">
-      <!-- Cards rendered by JS -->
-    </div>
+    <div class="inventory-grid" id="ui-inventory"></div>
   </div>
 
   <!-- 3. ARENA (PVP) -->
@@ -61,14 +56,14 @@
     <div class="battle-hud">
       <div><div class="name-plate">COMMANDER</div><div class="hp-container"><div class="hp-fill hp-player" id="p-hp"></div></div></div>
       <div class="vs-logo">VS</div>
-      <div style="text-align:right;"><div class="name-plate">ENEMY</div><div class="hp-container"><div class="hp-fill hp-enemy" id="e-hp"></div></div></div>
+      <div style="text-align:right;"><div class="name-plate">SHADOW</div><div class="hp-container"><div class="hp-fill hp-enemy" id="e-hp"></div></div></div>
     </div>
     
     <div class="arena-floor">
-      <img class="fighter-img p-fighter-img" id="p-char-img" src="assets/char_default.png">
+      <img class="fighter-img p-fighter-img" id="p-char-img" src="assets/char_default_left.png">
       <img class="pet-img left-pet" id="p-pet-img" src="assets/pet_dog_attack.png">
       
-      <img class="fighter-img e-fighter-img" id="e-char-img" src="assets/char_epic.png">
+      <img class="fighter-img e-fighter-img" id="e-char-img" src="assets/char_epic_right.png">
       <img class="pet-img right-pet" id="e-pet-img" src="assets/pet_dragon_attack.png">
     </div>
     
@@ -83,7 +78,7 @@
     <div class="bg-overlay"></div>
     <div class="boss-container">
       <h1 class="glow-magenta">MECH BOSS</h1>
-      <div class="hp-container" style="width: 80%; height: 20px;"><div class="hp-fill hp-enemy" id="boss-hp" style="width:100%"></div></div>
+      <div class="hp-container" style="width: 100%; height: 24px;"><div class="hp-fill hp-enemy" id="boss-hp" style="width:100%"></div></div>
       <button class="btn btn-cyan" onclick="fightBoss()" id="btn-boss">ATTACK BOSS</button>
     </div>
   </div>
@@ -109,7 +104,7 @@
   <div id="upgrade-modal" class="modal">
     <div class="modal-content">
       <h2 id="modal-title" style="color:var(--cyan); margin-bottom:10px;">Item Name</h2>
-      <img id="modal-img" src="" style="width:100px; margin-bottom:10px;">
+      <img id="modal-img" src="" style="width:120px; margin-bottom:15px; object-fit:contain; height:120px;">
       <p id="modal-desc" style="margin-bottom:20px;">Description</p>
       <button class="btn btn-cyan" id="btn-modal-action">ACTION</button>
       <button class="btn" style="margin-top:10px; background:#333;" onclick="closeModal()">CANCEL</button>
@@ -125,6 +120,6 @@
     <button class="nav-btn" onclick="nav('vault', this)"><i class="ph-duotone ph-vault"></i>Vault</button>
   </div>
 
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=4.0"></script>
 </body>
 </html>
