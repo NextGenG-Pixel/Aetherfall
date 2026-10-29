@@ -6,10 +6,13 @@
   <title>Aetherfall: Nexus Protocol</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <link rel="stylesheet" href="style.css?v=4.0">
+  <link rel="stylesheet" href="style.css?v=7.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+
+  <!-- DYNAMIC PARTICLES BACKGROUND -->
+  <canvas id="particles-canvas"></canvas>
 
   <!-- LOADING SCREEN -->
   <div id="loading">
@@ -28,13 +31,20 @@
   <div class="screen active" id="outpost">
     <div class="bg" style="background-image: url('assets/bg_home.jpg');"></div>
     <div class="bg-overlay"></div>
+    
     <div class="outpost-content">
       <h1 class="total-power" id="ui-total-power">POWER: 0</h1>
+      
       <div class="char-area">
-        <img src="assets/char_default.png" class="main-char" id="ui-main-char">
+        <div class="holo-ring"></div>
+        <!-- Main Character Image -->
+        <img src="assets/char_default.png" class="main-char" id="ui-main-char" onerror="this.src='https://via.placeholder.com/250/000000/00f3ff?text=CHAR'">
+        
+        <!-- HUD Slots -->
         <div class="hud-slot slot-w"><img id="ui-slot-wep" src="assets/wep_rifle_normal.png"></div>
         <div class="hud-slot slot-p"><img id="ui-slot-pet" src="assets/pet_dog_normal.png"></div>
       </div>
+      
       <div class="action-area">
         <button class="btn btn-magenta" onclick="nav('arena', this)">FIGHT (PVP)</button>
         <button class="btn btn-cyan" onclick="nav('sector', this)">BOSS (PVE)</button>
@@ -53,18 +63,24 @@
   <div class="screen" id="arena">
     <div class="bg" style="background-image: url('assets/bg_battle.jpg');"></div>
     <div class="bg-overlay"></div>
+    
     <div class="battle-hud">
-      <div><div class="name-plate">COMMANDER</div><div class="hp-container"><div class="hp-fill hp-player" id="p-hp"></div></div></div>
+      <div><div class="name-plate glow-cyan">COMMANDER</div><div class="hp-container"><div class="hp-fill hp-player" id="p-hp"></div></div></div>
       <div class="vs-logo">VS</div>
-      <div style="text-align:right;"><div class="name-plate">SHADOW</div><div class="hp-container"><div class="hp-fill hp-enemy" id="e-hp"></div></div></div>
+      <div style="text-align:right;"><div class="name-plate glow-magenta">SHADOW</div><div class="hp-container"><div class="hp-fill hp-enemy" id="e-hp"></div></div></div>
     </div>
     
-    <div class="arena-floor">
-      <img class="fighter-img p-fighter-img" id="p-char-img" src="assets/char_default_left.png">
-      <img class="pet-img left-pet" id="p-pet-img" src="assets/pet_dog_attack.png">
+    <div class="arena-floor" id="arena-floor">
+      <div class="fighter-container">
+        <img class="fighter-img p-fighter-img" id="p-char-img" src="assets/char_default.png">
+        <img class="pet-img left-pet" id="p-pet-img" src="assets/pet_dog_normal.png">
+      </div>
       
-      <img class="fighter-img e-fighter-img" id="e-char-img" src="assets/char_epic_right.png">
-      <img class="pet-img right-pet" id="e-pet-img" src="assets/pet_dragon_attack.png">
+      <div class="fighter-container enemy-side">
+        <!-- Enemy Images -->
+        <img class="fighter-img e-fighter-img" id="e-char-img" src="assets/char_enemy.png">
+        <img class="pet-img right-pet" id="e-pet-img" src="assets/pet_dragon_legendary.png">
+      </div>
     </div>
     
     <div class="battle-controls">
@@ -78,7 +94,7 @@
     <div class="bg-overlay"></div>
     <div class="boss-container">
       <h1 class="glow-magenta">MECH BOSS</h1>
-      <div class="hp-container" style="width: 100%; height: 24px;"><div class="hp-fill hp-enemy" id="boss-hp" style="width:100%"></div></div>
+      <div class="hp-container" style="width: 100%; height: 24px; box-shadow: 0 0 20px red;"><div class="hp-fill hp-enemy" id="boss-hp" style="width:100%"></div></div>
       <button class="btn btn-cyan" onclick="fightBoss()" id="btn-boss">ATTACK BOSS</button>
     </div>
   </div>
@@ -90,24 +106,24 @@
     <div class="vault-content">
       <h1 class="glow-cyan">$ATHF VAULT</h1>
       <div class="vault-card">
-        <h3 style="color:var(--gold); margin-bottom:10px;">Requirements</h3>
-        <p>Iron: 10,000 / 100k</p>
-        <p>Titanium: 1,000 / 50k</p>
-        <p>Dark Matter: 10 / 5k</p>
-        <p>Plasma Core: 1 / 500</p>
+        <h3 style="color:var(--gold); margin-bottom:15px; font-family:'Orbitron';">REQUIREMENTS</h3>
+        <div class="vault-row"><span>Iron</span> <span>10,000 / 100k</span></div>
+        <div class="vault-row"><span>Titanium</span> <span>1,000 / 50k</span></div>
+        <div class="vault-row"><span>Dark Matter</span> <span>10 / 5k</span></div>
+        <div class="vault-row"><span>Plasma Core</span> <span>1 / 500</span></div>
       </div>
       <button class="btn btn-magenta" style="opacity:0.5;">WITHDRAW LOCKED</button>
     </div>
   </div>
 
-  <!-- MODAL (Unlock / Equip) -->
+  <!-- MODAL -->
   <div id="upgrade-modal" class="modal">
     <div class="modal-content">
-      <h2 id="modal-title" style="color:var(--cyan); margin-bottom:10px;">Item Name</h2>
-      <img id="modal-img" src="" style="width:120px; margin-bottom:15px; object-fit:contain; height:120px;">
+      <h2 id="modal-title" class="glow-cyan" style="margin-bottom:15px;">Item Name</h2>
+      <img id="modal-img" src="" style="width:140px; margin-bottom:20px; object-fit:contain; height:140px; filter: drop-shadow(0 0 20px var(--cyan));">
       <p id="modal-desc" style="margin-bottom:20px;">Description</p>
       <button class="btn btn-cyan" id="btn-modal-action">ACTION</button>
-      <button class="btn" style="margin-top:10px; background:#333;" onclick="closeModal()">CANCEL</button>
+      <button class="btn" style="margin-top:10px; background:#333; color:#aaa;" onclick="closeModal()">CANCEL</button>
     </div>
   </div>
 
@@ -120,6 +136,6 @@
     <button class="nav-btn" onclick="nav('vault', this)"><i class="ph-duotone ph-vault"></i>Vault</button>
   </div>
 
-  <script src="app.js?v=4.0"></script>
+  <script src="app.js?v=7.0"></script>
 </body>
 </html>
