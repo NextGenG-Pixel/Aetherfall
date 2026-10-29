@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Aetherfall: Nexus Protocol</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <link rel="stylesheet" href="style.css?v=7.0">
+  <link rel="stylesheet" href="style.css?v=9.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
-  <!-- DYNAMIC PARTICLES BACKGROUND -->
   <canvas id="particles-canvas"></canvas>
 
   <!-- LOADING SCREEN -->
@@ -20,24 +18,33 @@
     <div class="loader-bar"><div class="loader-fill"></div></div>
   </div>
 
-  <!-- TOP HUD -->
-  <div class="top-hud" id="global-hud">
-    <div class="res-pill"><img src="assets/icon_gem.png" onerror="this.src='https://via.placeholder.com/20/00f3ff'"> <span id="ui-gems">50</span></div>
-    <div class="res-pill"><img src="assets/token_iron.png" onerror="this.src='https://via.placeholder.com/20/888'"> <span id="ui-iron">1000</span></div>
-    <div class="res-pill"><img src="assets/token_plasmacore.png" onerror="this.src='https://via.placeholder.com/20/f0f'"> <span id="ui-pc">5</span></div>
+  <!-- TOP BAR (Profile & Resources) -->
+  <div class="top-bar">
+    <!-- Profile (Left) -->
+    <div class="profile-hud">
+      <img src="assets/char_default.png" class="profile-pic" onerror="this.src='https://via.placeholder.com/50'">
+      <div class="level-badge">1</div>
+    </div>
+
+    <!-- Resources (Right of profile) -->
+    <div class="resource-scroll">
+      <div class="res-pill"><img src="assets/icon_gem.png" onerror="this.src='https://via.placeholder.com/20/00f3ff'"> <span id="ui-gems">50</span></div>
+      <div class="res-pill"><img src="assets/token_iron.png" onerror="this.src='https://via.placeholder.com/20/888'"> <span id="ui-iron">1000</span></div>
+      <div class="res-pill"><img src="assets/token_titanium.png" onerror="this.src='https://via.placeholder.com/20/ccc'"> <span id="ui-tita">500</span></div>
+      <div class="res-pill"><img src="assets/token_darkmatter.png" onerror="this.src='https://via.placeholder.com/20/f0f'"> <span id="ui-dm">10</span></div>
+      <div class="res-pill"><img src="assets/token_plasmacore.png" onerror="this.src='https://via.placeholder.com/20/f00'"> <span id="ui-pc">5</span></div>
+    </div>
   </div>
 
-  <!-- 1. OUTPOST -->
+  <!-- 1. OUTPOST (HOME SCREEN) -->
   <div class="screen active" id="outpost">
     <div class="bg" style="background-image: url('assets/bg_home.jpg');"></div>
     <div class="bg-overlay"></div>
     
     <div class="outpost-content">
-      <h1 class="total-power" id="ui-total-power">POWER: 0</h1>
-      
       <div class="char-area">
         <div class="holo-ring"></div>
-        <!-- Main Character Image -->
+        <!-- Character Image (Black bg removed via CSS) -->
         <img src="assets/char_default.png" class="main-char" id="ui-main-char" onerror="this.src='https://via.placeholder.com/250/000000/00f3ff?text=CHAR'">
         
         <!-- HUD Slots -->
@@ -46,8 +53,8 @@
       </div>
       
       <div class="action-area">
-        <button class="btn btn-magenta" onclick="nav('arena', this)">FIGHT (PVP)</button>
-        <button class="btn btn-cyan" onclick="nav('sector', this)">BOSS (PVE)</button>
+        <button class="btn btn-magenta" onclick="nav('arena', document.querySelector('[data-target=\'arena\']'))">FIGHT (PVP)</button>
+        <button class="btn btn-cyan" onclick="nav('sector', document.querySelector('[data-target=\'sector\']'))">BOSS (PVE)</button>
       </div>
     </div>
   </div>
@@ -56,6 +63,12 @@
   <div class="screen" id="armory">
     <div class="bg" style="background-image: url('assets/bg_page.jpg');"></div>
     <div class="bg-overlay"></div>
+    
+    <!-- POWER moved here -->
+    <div class="armory-header">
+      <h1 class="total-power" id="ui-total-power">POWER: 0</h1>
+    </div>
+    
     <div class="inventory-grid" id="ui-inventory"></div>
   </div>
 
@@ -67,7 +80,7 @@
     <div class="battle-hud">
       <div><div class="name-plate glow-cyan">COMMANDER</div><div class="hp-container"><div class="hp-fill hp-player" id="p-hp"></div></div></div>
       <div class="vs-logo">VS</div>
-      <div style="text-align:right;"><div class="name-plate glow-magenta">SHADOW</div><div class="hp-container"><div class="hp-fill hp-enemy" id="e-hp"></div></div></div>
+      <div style="text-align:right;"><div class="name-plate glow-magenta">ENEMY</div><div class="hp-container"><div class="hp-fill hp-enemy" id="e-hp"></div></div></div>
     </div>
     
     <div class="arena-floor" id="arena-floor">
@@ -77,7 +90,6 @@
       </div>
       
       <div class="fighter-container enemy-side">
-        <!-- Enemy Images -->
         <img class="fighter-img e-fighter-img" id="e-char-img" src="assets/char_enemy.png">
         <img class="pet-img right-pet" id="e-pet-img" src="assets/pet_dragon_legendary.png">
       </div>
@@ -112,30 +124,44 @@
         <div class="vault-row"><span>Dark Matter</span> <span>10 / 5k</span></div>
         <div class="vault-row"><span>Plasma Core</span> <span>1 / 500</span></div>
       </div>
-      <button class="btn btn-magenta" style="opacity:0.5;">WITHDRAW LOCKED</button>
     </div>
   </div>
 
-  <!-- MODAL -->
+  <!-- MODAL (UNLOCK / EQUIP) -->
   <div id="upgrade-modal" class="modal">
     <div class="modal-content">
       <h2 id="modal-title" class="glow-cyan" style="margin-bottom:15px;">Item Name</h2>
-      <img id="modal-img" src="" style="width:140px; margin-bottom:20px; object-fit:contain; height:140px; filter: drop-shadow(0 0 20px var(--cyan));">
+      <img id="modal-img" src="" style="width:140px; margin-bottom:20px; object-fit:contain; height:140px; filter: drop-shadow(0 0 20px var(--cyan)); mix-blend-mode: screen;">
       <p id="modal-desc" style="margin-bottom:20px;">Description</p>
       <button class="btn btn-cyan" id="btn-modal-action">ACTION</button>
       <button class="btn" style="margin-top:10px; background:#333; color:#aaa;" onclick="closeModal()">CANCEL</button>
     </div>
   </div>
 
-  <!-- BOTTOM NAVIGATION -->
-  <div class="bottom-nav" id="global-nav">
-    <button class="nav-btn active" onclick="nav('outpost', this)"><i class="ph-duotone ph-planet"></i>Outpost</button>
-    <button class="nav-btn" onclick="nav('armory', this)"><i class="ph-duotone ph-sword"></i>Armory</button>
-    <button class="nav-btn" onclick="nav('sector', this)"><i class="ph-duotone ph-globe"></i>Sector</button>
-    <button class="nav-btn" onclick="nav('arena', this)"><i class="ph-duotone ph-trophy"></i>Arena</button>
-    <button class="nav-btn" onclick="nav('vault', this)"><i class="ph-duotone ph-vault"></i>Vault</button>
+  <!-- RIGHT SIDE NAVIGATION -->
+  <div class="right-nav">
+    <button class="nav-btn active" data-target="outpost" onclick="nav('outpost', this)">
+      <img src="assets/nav_outpost.png" onerror="this.src='https://via.placeholder.com/40'">
+      <span>Outpost</span>
+    </button>
+    <button class="nav-btn" data-target="armory" onclick="nav('armory', this)">
+      <img src="assets/nav_armory.png" onerror="this.src='https://via.placeholder.com/40'">
+      <span>Armory</span>
+    </button>
+    <button class="nav-btn" data-target="sector" onclick="nav('sector', this)">
+      <img src="assets/nav_sector.png" onerror="this.src='https://via.placeholder.com/40'">
+      <span>Sector</span>
+    </button>
+    <button class="nav-btn" data-target="arena" onclick="nav('arena', this)">
+      <img src="assets/nav_arena.png" onerror="this.src='https://via.placeholder.com/40'">
+      <span>Arena</span>
+    </button>
+    <button class="nav-btn" data-target="vault" onclick="nav('vault', this)">
+      <img src="assets/nav_market.png" onerror="this.src='https://via.placeholder.com/40'">
+      <span>Vault</span>
+    </button>
   </div>
 
-  <script src="app.js?v=7.0"></script>
+  <script src="app.js?v=9.0"></script>
 </body>
 </html>
