@@ -1,47 +1,26 @@
 if (window.Telegram) { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); }
 
-// --- PARTICLES BACKGROUND ---
+// Particles
 const canvas = document.getElementById('particles-canvas');
 const ctx = canvas.getContext('2d');
 let particlesArray = [];
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
 class Particle {
-  constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.size = Math.random() * 2 + 0.5;
-    this.speedY = Math.random() * 1 + 0.2;
-    this.opacity = Math.random() * 0.8 + 0.2;
-  }
-  update() {
-    this.y -= this.speedY;
-    if (this.y < 0) { this.y = canvas.height; this.x = Math.random() * canvas.width; }
-  }
-  draw() {
-    ctx.fillStyle = `rgba(0, 243, 255, ${this.opacity})`;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.size = Math.random()*2+0.5; this.speedY = Math.random()*1+0.2; this.opacity = Math.random()*0.8+0.2; }
+  update() { this.y -= this.speedY; if(this.y < 0) { this.y = canvas.height; this.x = Math.random()*canvas.width; } }
+  draw() { ctx.fillStyle = `rgba(0, 243, 255, ${this.opacity})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); }
 }
-for (let i = 0; i < 50; i++) { particlesArray.push(new Particle()); }
-function animateParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particlesArray.forEach(p => { p.update(); p.draw(); });
-  requestAnimationFrame(animateParticles);
-}
-animateParticles();
+for(let i=0; i<50; i++) particlesArray.push(new Particle());
+function animate() { ctx.clearRect(0,0,canvas.width, canvas.height); particlesArray.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+animate();
 
-// --- GAME LOGIC ---
+// Game State
 let user = {
-  gems: 50, iron: 1000, plasma: 5,
+  gems: 50, iron: 1000, titanium: 500, darkMatter: 10, plasma: 5,
   equipped: { char: 'char_default', weapon: 'wep_rifle_normal', pet: 'pet_dog_normal' },
   unlockedItems: ['char_default', 'wep_rifle_normal', 'pet_dog_normal']
 };
 
-// Using EXACT filenames from your GitHub folder
 const allGameItems = [
   { id: 'char_default', name: 'Cadet', type: 'char', rarity: 'normal', power: 100 },
   { id: 'char_epic', name: 'Cyber Ninja', type: 'char', rarity: 'epic', power: 500 },
@@ -51,8 +30,6 @@ const allGameItems = [
   { id: 'pet_dragon_legendary', name: 'Mecha Dragon', type: 'pet', rarity: 'legendary', power: 1000 }
 ];
 
-let selectedItem = null;
-
 window.onload = () => {
   setTimeout(() => { document.getElementById('loading').classList.add('hide'); updateUI(); }, 1500);
 };
@@ -60,6 +37,8 @@ window.onload = () => {
 function updateUI() {
   document.getElementById('ui-gems').innerText = user.gems;
   document.getElementById('ui-iron').innerText = user.iron;
+  document.getElementById('ui-tita').innerText = user.titanium;
+  document.getElementById('ui-dm').innerText = user.darkMatter;
   document.getElementById('ui-pc').innerText = user.plasma;
   
   let total = 0;
@@ -69,11 +48,9 @@ function updateUI() {
   }
   document.getElementById('ui-total-power').innerText = `POWER: ${total}`;
   
-  // EXACT Matching: Just appending .png to the equipped ID
   document.getElementById('ui-slot-wep').src = `assets/${user.equipped.weapon}.png`;
   document.getElementById('ui-slot-pet').src = `assets/${user.equipped.pet}.png`;
 
-  // For Arena: Player uses equipped, Enemy uses hardcoded char_enemy
   document.getElementById('p-char-img').src = `assets/${user.equipped.char}.png`;
   document.getElementById('p-pet-img').src = `assets/${user.equipped.pet}.png`;
   document.getElementById('e-char-img').src = `assets/char_enemy.png`;
@@ -100,7 +77,7 @@ function renderArmory() {
     
     let cardClass = isUnlocked ? `card-${item.rarity}` : 'card-locked';
     let lockIcon = isUnlocked ? '' : '<i class="ph-fill ph-lock-key lock-icon"></i>';
-    let equippedText = isEquipped ? '<div style="color:var(--green); font-size:12px; font-family:\'Orbitron\'; font-weight:bold; margin-top:5px; text-shadow:0 0 10px #22c55e;">EQUIPPED</div>' : '';
+    let equippedText = isEquipped ? '<div style="color:var(--green); font-size:10px; font-weight:bold; margin-top:3px;">EQUIPPED</div>' : '';
     
     return `
       <div class="item-card ${cardClass}" onclick="handleItemClick('${item.id}')">
@@ -121,31 +98,24 @@ function handleItemClick(id) {
   const isUnlocked = user.unlockedItems.includes(id);
   
   if (!isUnlocked) {
-    selectedItem = item;
     document.getElementById('upgrade-modal').style.display = 'flex';
     document.getElementById('modal-img').src = `assets/${id}.png`;
     document.getElementById('modal-title').innerText = `UNLOCK ${item.name.toUpperCase()}`;
-    document.getElementById('modal-desc').innerHTML = `Cost: <span style="color:gold; font-weight:bold; text-shadow:0 0 10px gold;">500 Iron + 2 Plasma</span>`;
+    document.getElementById('modal-desc').innerHTML = `Cost: <span style="color:gold;">500 Iron + 2 Plasma</span>`;
     
     let btn = document.getElementById('btn-modal-action');
     btn.innerText = "UNLOCK NOW";
-    btn.onclick = unlockItem;
+    btn.onclick = () => {
+      if(user.iron >= 500 && user.plasma >= 2) {
+        user.iron -= 500; user.plasma -= 2;
+        user.unlockedItems.push(id);
+        updateUI(); closeModal();
+      } else { alert("Not enough materials!"); }
+    };
   } else {
     user.equipped[item.type] = item.id;
     updateUI();
   }
-}
-
-function unlockItem() {
-  if(user.iron >= 500 && user.plasma >= 2) {
-    user.iron -= 500;
-    user.plasma -= 2;
-    user.unlockedItems.push(selectedItem.id);
-    updateUI();
-  } else {
-    alert("Not enough materials!");
-  }
-  closeModal();
 }
 
 function closeModal() { document.getElementById('upgrade-modal').style.display = 'none'; }
@@ -154,8 +124,7 @@ let isFighting = false, pHpVal = 100, eHpVal = 100;
 
 function startBattle() {
   if(isFighting) return;
-  isFighting = true;
-  pHpVal = 100; eHpVal = 100;
+  isFighting = true; pHpVal = 100; eHpVal = 100;
   document.getElementById('p-hp').style.width = '100%';
   document.getElementById('e-hp').style.width = '100%';
   document.getElementById('btn-fight').innerText = "FIGHTING...";
@@ -177,12 +146,9 @@ function startBattle() {
         pChar.classList.remove('attack-l');
         eChar.classList.add('hit-flash');
         arenaFloor.classList.add('screen-shake');
-        
         eHpVal -= 25; document.getElementById('e-hp').style.width = `${Math.max(0, eHpVal)}%`;
         showDamage(eChar, 2500);
-        
         if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
-        
         setTimeout(() => { eChar.classList.remove('hit-flash'); arenaFloor.classList.remove('screen-shake'); }, 300);
       }, 200);
       setTimeout(() => { pPet.classList.remove('pet-lunge-left'); }, 800);
@@ -193,12 +159,9 @@ function startBattle() {
         eChar.classList.remove('attack-r');
         pChar.classList.add('hit-flash');
         arenaFloor.classList.add('screen-shake');
-        
         pHpVal -= 20; document.getElementById('p-hp').style.width = `${Math.max(0, pHpVal)}%`;
         showDamage(pChar, 2000);
-        
         if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
-        
         setTimeout(() => { pChar.classList.remove('hit-flash'); arenaFloor.classList.remove('screen-shake'); }, 300);
       }, 200);
       setTimeout(() => { ePet.classList.remove('pet-lunge-right'); }, 800);
@@ -211,10 +174,20 @@ function startBattle() {
         else { alert("DEFEAT!"); }
         updateUI();
         isFighting = false; document.getElementById('btn-fight').innerText = "START ATTACK";
-        nav('outpost', document.querySelectorAll('.nav-btn')[0]);
+        nav('outpost', document.querySelector('[data-target="outpost"]'));
       }, 500);
     }
   }, 1000);
+}
+
+function showDamage(target, amount) {
+  const rect = target.getBoundingClientRect();
+  const dmg = document.createElement('div');
+  dmg.classList.add('dmg-text'); dmg.innerText = `-${amount}`;
+  dmg.style.left = `${rect.left + (rect.width/2) - 30}px`; 
+  dmg.style.top = `${rect.top + 40}px`;
+  document.body.appendChild(dmg); 
+  setTimeout(() => dmg.remove(), 1000);
 }
 
 function fightBoss() {
@@ -233,14 +206,4 @@ function fightBoss() {
       updateUI(); btn.innerText = "ATTACK BOSS";
     }
   }, 400);
-}
-
-function showDamage(target, amount) {
-  const rect = target.getBoundingClientRect();
-  const dmg = document.createElement('div');
-  dmg.classList.add('dmg-text'); dmg.innerText = `-${amount}`;
-  dmg.style.left = `${rect.left + (rect.width/2) - 40}px`; 
-  dmg.style.top = `${rect.top + 50}px`;
-  document.body.appendChild(dmg); 
-  setTimeout(() => dmg.remove(), 1000);
 }
