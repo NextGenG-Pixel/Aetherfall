@@ -1,53 +1,20 @@
-// Telegram Init
-if (window.Telegram) { 
-  window.Telegram.WebApp.ready(); 
-  window.Telegram.WebApp.expand(); 
-}
+if (window.Telegram) { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); }
 
-// ==========================================
-// 1. PARTICLE BACKGROUND SYSTEM
-// ==========================================
+// Particles
 const canvas = document.getElementById('particles-canvas');
 const ctx = canvas.getContext('2d');
 let particlesArray = [];
-canvas.width = window.innerWidth; 
-canvas.height = window.innerHeight;
-
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
 class Particle {
-  constructor() { 
-    this.x = Math.random() * canvas.width; 
-    this.y = Math.random() * canvas.height; 
-    this.size = Math.random() * 2 + 0.5; 
-    this.speedY = Math.random() * 1 + 0.2; 
-    this.opacity = Math.random() * 0.8 + 0.2; 
-  }
-  update() { 
-    this.y -= this.speedY; 
-    if(this.y < 0) { 
-      this.y = canvas.height; 
-      this.x = Math.random() * canvas.width; 
-    } 
-  }
-  draw() { 
-    ctx.fillStyle = `rgba(0, 243, 255, ${this.opacity})`; 
-    ctx.beginPath(); 
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
-    ctx.fill(); 
-  }
+  constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.size = Math.random()*2+0.5; this.speedY = Math.random()*1+0.2; this.opacity = Math.random()*0.8+0.2; }
+  update() { this.y -= this.speedY; if(this.y < 0) { this.y = canvas.height; this.x = Math.random()*canvas.width; } }
+  draw() { ctx.fillStyle = `rgba(0, 243, 255, ${this.opacity})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); }
 }
-
 for(let i=0; i<50; i++) particlesArray.push(new Particle());
-
-function animate() { 
-  ctx.clearRect(0, 0, canvas.width, canvas.height); 
-  particlesArray.forEach(p => { p.update(); p.draw(); }); 
-  requestAnimationFrame(animate); 
-}
+function animate() { ctx.clearRect(0,0,canvas.width, canvas.height); particlesArray.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
 animate();
 
-// ==========================================
-// 2. GAME STATE & DATABASE
-// ==========================================
+// Game State
 let user = {
   gems: 50, iron: 1000, titanium: 500, darkMatter: 10, plasma: 5,
   equipped: { char: 'char_default', weapon: 'wep_rifle_normal', pet: 'pet_dog_normal' },
@@ -55,37 +22,26 @@ let user = {
 };
 
 const allGameItems = [
-  // Characters
   { id: 'char_default', name: 'Cadet', type: 'char', rarity: 'normal', power: 100 },
   { id: 'char_epic', name: 'Cyber Ninja', type: 'char', rarity: 'epic', power: 500 },
-  { id: 'char_enemy', name: 'Shadow', type: 'char', rarity: 'normal', power: 100 }, // Used for enemy
-  // Weapons
+  { id: 'char_enemy', name: 'Shadow', type: 'char', rarity: 'normal', power: 100 },
   { id: 'wep_rifle_normal', name: 'Std Rifle', type: 'weapon', rarity: 'normal', power: 50 },
   { id: 'wep_rifle_epic', name: 'Plasma Rifle', type: 'weapon', rarity: 'epic', power: 300 },
-  // Pets
   { id: 'pet_dog_normal', name: 'Cyber Dog', type: 'pet', rarity: 'normal', power: 50 },
   { id: 'pet_dragon_legendary', name: 'Mecha Dragon', type: 'pet', rarity: 'legendary', power: 1000 }
 ];
 
-// ==========================================
-// 3. INITIALIZATION & UI UPDATE
-// ==========================================
 window.onload = () => {
-  setTimeout(() => { 
-    document.getElementById('loading').classList.add('hide'); 
-    updateUI(); 
-  }, 1500);
+  setTimeout(() => { document.getElementById('loading').classList.add('hide'); updateUI(); }, 1500);
 };
 
 function updateUI() {
-  // Update Text Values
   document.getElementById('ui-gems').innerText = user.gems;
   document.getElementById('ui-iron').innerText = user.iron;
   document.getElementById('ui-tita').innerText = user.titanium;
   document.getElementById('ui-dm').innerText = user.darkMatter;
   document.getElementById('ui-pc').innerText = user.plasma;
   
-  // Calculate Total Power
   let total = 0;
   for (let type in user.equipped) {
     let item = allGameItems.find(i => i.id === user.equipped[type]);
@@ -93,45 +49,29 @@ function updateUI() {
   }
   document.getElementById('ui-total-power').innerText = `POWER: ${total}`;
   
-  // Update Main Character Image (Home Screen)
   document.getElementById('ui-main-char').src = `assets/${user.equipped.char}.png`;
-
-  // Update Arena Images
   document.getElementById('p-char-img').src = `assets/${user.equipped.char}.png`;
   document.getElementById('p-pet-img').src = `assets/${user.equipped.pet}.png`;
-  // Enemy is hardcoded for now
   document.getElementById('e-char-img').src = `assets/char_enemy.png`;
   document.getElementById('e-pet-img').src = `assets/pet_dragon_legendary.png`;
 
   renderArmory();
 }
 
-// ==========================================
-// 4. NAVIGATION
-// ==========================================
 function nav(screenId, btnElement) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
-  
   if(btnElement) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     btnElement.classList.add('active');
   }
-  
-  if (window.Telegram?.WebApp?.HapticFeedback) {
-    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-  }
+  if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
 }
 
-// ==========================================
-// 5. ARMORY & INVENTORY LOGIC
-// ==========================================
 function renderArmory() {
   const grid = document.getElementById('ui-inventory');
   grid.innerHTML = allGameItems.map(item => {
-    // Skip enemy from player inventory
     if(item.id === 'char_enemy') return ''; 
-
     const isUnlocked = user.unlockedItems.includes(item.id);
     const isEquipped = user.equipped[item.type] === item.id;
     
@@ -158,7 +98,6 @@ function handleItemClick(id) {
   const isUnlocked = user.unlockedItems.includes(id);
   
   if (!isUnlocked) {
-    // Show Unlock Modal
     document.getElementById('upgrade-modal').style.display = 'flex';
     document.getElementById('modal-img').src = `assets/${id}.png`;
     document.getElementById('modal-title').innerText = `UNLOCK ${item.name.toUpperCase()}`;
@@ -168,39 +107,24 @@ function handleItemClick(id) {
     btn.innerText = "UNLOCK NOW";
     btn.onclick = () => {
       if(user.iron >= 500 && user.plasma >= 2) {
-        user.iron -= 500; 
-        user.plasma -= 2;
+        user.iron -= 500; user.plasma -= 2;
         user.unlockedItems.push(id);
-        updateUI(); 
-        closeModal();
-        if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-      } else { 
-        alert("Not enough materials! Go defeat bosses in the Sector."); 
-      }
+        updateUI(); closeModal();
+      } else { alert("Not enough materials!"); }
     };
   } else {
-    // Equip Item
     user.equipped[item.type] = item.id;
     updateUI();
-    if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
   }
 }
 
-function closeModal() { 
-  document.getElementById('upgrade-modal').style.display = 'none'; 
-}
+function closeModal() { document.getElementById('upgrade-modal').style.display = 'none'; }
 
-// ==========================================
-// 6. PVP BATTLE LOGIC
-// ==========================================
 let isFighting = false, pHpVal = 100, eHpVal = 100;
 
 function startBattle() {
   if(isFighting) return;
-  isFighting = true; 
-  pHpVal = 100; 
-  eHpVal = 100;
-  
+  isFighting = true; pHpVal = 100; eHpVal = 100;
   document.getElementById('p-hp').style.width = '100%';
   document.getElementById('e-hp').style.width = '100%';
   document.getElementById('btn-fight').innerText = "FIGHTING...";
@@ -215,77 +139,57 @@ function startBattle() {
     const pPet = document.getElementById('p-pet-img');
     const ePet = document.getElementById('e-pet-img');
 
-    // Player's Turn
     if(turn % 2 !== 0) {
       pChar.classList.add('attack-l');
       pPet.classList.add('pet-lunge-left');
-      
       setTimeout(() => {
         pChar.classList.remove('attack-l');
         eChar.classList.add('hit-flash');
         arenaFloor.classList.add('screen-shake');
-        
-        eHpVal -= 25; 
-        document.getElementById('e-hp').style.width = `${Math.max(0, eHpVal)}%`;
+        eHpVal -= 25; document.getElementById('e-hp').style.width = `${Math.max(0, eHpVal)}%`;
         showDamage(eChar, 2500);
-        
         if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
-        
-        setTimeout(() => { 
-          eChar.classList.remove('hit-flash'); 
-          arenaFloor.classList.remove('screen-shake'); 
-        }, 300);
+        setTimeout(() => { eChar.classList.remove('hit-flash'); arenaFloor.classList.remove('screen-shake'); }, 300);
       }, 200);
-      
       setTimeout(() => { pPet.classList.remove('pet-lunge-left'); }, 800);
-    } 
-    // Enemy's Turn
-    else {
+    } else {
       eChar.classList.add('attack-r');
       ePet.classList.add('pet-lunge-right');
-      
       setTimeout(() => {
         eChar.classList.remove('attack-r');
         pChar.classList.add('hit-flash');
         arenaFloor.classList.add('screen-shake');
-        
-        pHpVal -= 20; 
-        document.getElementById('p-hp').style.width = `${Math.max(0, pHpVal)}%`;
+        pHpVal -= 20; document.getElementById('p-hp').style.width = `${Math.max(0, pHpVal)}%`;
         showDamage(pChar, 2000);
-        
         if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
-        
-        setTimeout(() => { 
-          pChar.classList.remove('hit-flash'); 
-          arenaFloor.classList.remove('screen-shake'); 
-        }, 300);
+        setTimeout(() => { pChar.classList.remove('hit-flash'); arenaFloor.classList.remove('screen-shake'); }, 300);
       }, 200);
-      
       setTimeout(() => { ePet.classList.remove('pet-lunge-right'); }, 800);
     }
 
-    // End Game Condition
     if(pHpVal <= 0 || eHpVal <= 0) {
       clearInterval(fightLoop);
       setTimeout(() => {
-        if(eHpVal <= 0) { 
-          user.iron += 200; 
-          alert("VICTORY! +200 Iron"); 
-        } else { 
-          alert("DEFEAT!"); 
-        }
+        if(eHpVal <= 0) { user.iron += 200; alert("VICTORY! +200 Iron"); }
+        else { alert("DEFEAT!"); }
         updateUI();
-        isFighting = false; 
-        document.getElementById('btn-fight').innerText = "START ATTACK";
+        isFighting = false; document.getElementById('btn-fight').innerText = "START ATTACK";
         nav('outpost', document.querySelector('[data-target="outpost"]'));
       }, 500);
     }
   }, 1000);
 }
 
-// ==========================================
-// 7. PVE BOSS LOGIC
-// ==========================================
+function showDamage(target, amount) {
+  const rect = target.getBoundingClientRect();
+  const dmg = document.createElement('div');
+  dmg.classList.add('dmg-text'); dmg.innerText = `-${amount}`;
+  dmg.style.left = `${rect.left + (rect.width/2) - 30}px`; 
+  dmg.style.top = `${rect.top + 40}px`;
+  document.body.appendChild(dmg); 
+  setTimeout(() => dmg.remove(), 1000);
+}
+
 function fightBoss() {
   let bossHp = 5000;
   const btn = document.getElementById('btn-boss');
@@ -295,28 +199,11 @@ function fightBoss() {
   let damage = setInterval(() => {
     bossHp -= 500;
     document.getElementById('boss-hp').style.width = `${(bossHp/5000)*100}%`;
-    
     if(bossHp <= 0) {
       clearInterval(damage);
       alert("Boss Defeated! +1000 Iron, +1 Plasma Core");
-      user.iron += 1000; 
-      user.plasma += 1;
-      updateUI(); 
-      btn.innerText = "ATTACK BOSS";
+      user.iron += 1000; user.plasma += 1;
+      updateUI(); btn.innerText = "ATTACK BOSS";
     }
   }, 400);
-}
-
-// ==========================================
-// 8. UTILITY FUNCTIONS
-// ==========================================
-function showDamage(target, amount) {
-  const rect = target.getBoundingClientRect();
-  const dmg = document.createElement('div');
-  dmg.classList.add('dmg-text'); 
-  dmg.innerText = `-${amount}`;
-  dmg.style.left = `${rect.left + (rect.width/2) - 30}px`; 
-  dmg.style.top = `${rect.top + 40}px`;
-  document.body.appendChild(dmg); 
-  setTimeout(() => dmg.remove(), 1000);
 }
