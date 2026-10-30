@@ -1,6 +1,5 @@
 if (window.Telegram) { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); }
 
-// Particles
 const canvas = document.getElementById('particles-canvas');
 const ctx = canvas.getContext('2d');
 let particlesArray = [];
@@ -14,7 +13,6 @@ for(let i=0; i<50; i++) particlesArray.push(new Particle());
 function animate() { ctx.clearRect(0,0,canvas.width, canvas.height); particlesArray.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
 animate();
 
-// Game State
 let user = {
   gems: 50, iron: 1000, titanium: 500, darkMatter: 10, plasma: 5,
   equipped: { char: 'char_default', weapon: 'wep_rifle_normal', pet: 'pet_dog_normal' },
