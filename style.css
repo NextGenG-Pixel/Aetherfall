@@ -10,69 +10,62 @@ body { width: 100vw; height: 100vh; overflow: hidden; background: #020205; font-
 
 /* SCREENS */
 .screen { position: absolute; inset: 0; display: none; flex-direction: column; z-index: 10; }
-.screen.active { display: flex; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.bg { position: absolute; inset: 0; z-index: -2; background-size: cover; background-position: center; }
-.bg-overlay { position: absolute; inset: 0; z-index: -1; background: linear-gradient(to bottom, rgba(2,2,5,0.1), rgba(2,2,5,0.1) 50%, rgba(2,2,5,0.8)); }
+.screen.active { display: flex; animation: fadeIn 0.4s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* TOP BAR (3D Glossy Currency) */
+/* Background Fix: Full Screen Cover */
+.bg { position: absolute; inset: 0; z-index: -2; background-size: cover; background-position: center top; background-repeat: no-repeat; }
+.bg-overlay { position: absolute; inset: 0; z-index: -1; background: linear-gradient(to bottom, rgba(2,2,5,0.1), rgba(2,2,5,0.1) 60%, rgba(2,2,5,0.9)); }
+
+/* TOP BAR (Premium Glossy) */
 .top-bar { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; gap: 12px; align-items: center; z-index: 50; }
 .profile-hud { position: relative; flex-shrink: 0; }
 .profile-pic { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--cyan); object-fit: cover; box-shadow: 0 0 15px var(--cyan); background: #000; }
-.level-badge { position: absolute; bottom: -5px; right: -5px; background: var(--gold); color: #000; font-family: 'Orbitron'; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 10px; }
+.level-badge { position: absolute; bottom: -5px; right: -5px; background: var(--gold); color: #000; font-family: 'Orbitron'; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 10px; box-shadow: 0 0 10px var(--gold); }
 
 .resource-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; flex-grow: 1; align-items: center; }
 .resource-scroll::-webkit-scrollbar { display: none; }
 .res-pill { 
-  /* Glossy 3D Box */
-  background: linear-gradient(135deg, rgba(30, 45, 70, 0.9), rgba(5, 10, 20, 0.95)); 
-  border: 1px solid rgba(0, 243, 255, 0.5); border-radius: 10px; 
-  padding: 6px 14px; display: flex; align-items: center; gap: 10px; 
-  font-family: 'Teko'; font-size: 24px; flex-shrink: 0; 
-  box-shadow: 0 4px 15px rgba(0,0,0,0.6), inset 0 2px 5px rgba(255,255,255,0.2), inset 0 -2px 5px rgba(0,0,0,0.5); 
+  /* 3D Glossy Tech Pill */
+  background: linear-gradient(180deg, rgba(40, 60, 90, 0.95), rgba(10, 15, 25, 0.98)); 
+  border: 1px solid rgba(0, 243, 255, 0.7); border-radius: 12px; 
+  padding: 8px 16px; display: flex; align-items: center; gap: 12px; 
+  font-family: 'Teko'; font-size: 26px; flex-shrink: 0; 
+  box-shadow: 0 5px 15px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.3), inset 0 -2px 5px rgba(0,0,0,0.5); 
   position: relative; overflow: hidden;
 }
-/* Glossy Reflection */
+/* Glossy Reflection Top */
 .res-pill::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent); pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent); pointer-events: none;
 }
-
-.icon-box { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
+.icon-box { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 0 5px rgba(0,0,0,0.8)); }
 .res-pill img { width: 100%; height: 100%; object-fit: contain; }
-.res-pill span { color: #fff; font-weight: bold; text-shadow: 0 0 8px rgba(0,243,255,0.8); }
+.res-pill span { color: #fff; font-weight: bold; text-shadow: 0 0 8px var(--cyan); letter-spacing: 1px; }
 
-/* RIGHT NAVIGATION (Floating Glass Buttons without box) */
-.right-nav { 
-  position: absolute; right: 12px; top: 50%; transform: translateY(-50%); 
-  display: flex; flex-direction: column; gap: 15px; z-index: 100; 
-}
-.nav-btn { 
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; 
-  background: transparent; /* Removed the ugly box */
-  border: none; padding: 0; color: #8b9bb4; font-family: 'Orbitron'; font-size: 9px; font-weight: bold; 
-  transition: 0.3s; cursor: pointer;
-}
+/* RIGHT NAVIGATION (3D Floating) */
+.right-nav { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+.nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: transparent; border: none; color: #8b9bb4; font-family: 'Orbitron'; font-size: 9px; font-weight: bold; transition: 0.3s; cursor: pointer; }
 .nav-icon-wrapper {
-  width: 55px; height: 55px; border-radius: 50%;
-  background: linear-gradient(135deg, rgba(0,243,255,0.1), rgba(0,0,0,0.6));
-  border: 1px solid rgba(0,243,255,0.3); backdrop-filter: blur(8px);
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(20, 35, 55, 0.9), rgba(5, 10, 20, 0.95));
+  border: 2px solid rgba(255, 255, 255, 0.1); 
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,243,255,0.1);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.6), inset 0 0 15px rgba(0, 0, 0, 0.8);
   transition: 0.3s;
 }
-.nav-btn img { width: 32px; height: 32px; object-fit: contain; filter: grayscale(100%) brightness(0.6); transition: 0.3s; }
+.nav-btn img { width: 35px; height: 35px; object-fit: contain; filter: grayscale(100%) brightness(0.5); transition: 0.3s; }
 .nav-btn span { text-shadow: 0 2px 4px #000; }
 
-/* Active State */
+/* Active State with Strong Glow */
 .nav-btn.active { color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
 .nav-btn.active .nav-icon-wrapper { 
   border-color: var(--cyan); 
-  box-shadow: 0 0 20px rgba(0,243,255,0.5), inset 0 0 15px rgba(0,243,255,0.4);
-  background: rgba(0, 243, 255, 0.15);
+  box-shadow: 0 0 25px rgba(0,243,255,0.6), inset 0 0 20px rgba(0,243,255,0.4);
+  background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(0, 0, 0, 0.8));
   transform: scale(1.1);
 }
-.nav-btn.active img { filter: grayscale(0%) drop-shadow(0 0 10px var(--cyan)); }
+.nav-btn.active img { filter: grayscale(0%) drop-shadow(0 0 10px var(--cyan)); transform: scale(1.1); }
 
 /* BUTTONS */
 .btn { padding: 15px; font-family: 'Orbitron'; font-size: 14px; font-weight: 900; text-transform: uppercase; cursor: pointer; border: none; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); width: 100%; transition: 0.1s; }
@@ -80,17 +73,18 @@ body { width: 100vw; height: 100vh; overflow: hidden; background: #020205; font-
 .btn-cyan { background: linear-gradient(180deg, #005b66, #001f24); color: var(--cyan); border: 1px solid var(--cyan); box-shadow: 0 0 15px rgba(0,243,255,0.3); }
 .btn-magenta { background: linear-gradient(180deg, #660066, #240024); color: var(--magenta); border: 1px solid var(--magenta); box-shadow: 0 0 15px rgba(255,0,255,0.3); }
 
-/* OUTPOST (Character Not Transparent) */
-.outpost-content { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-right: 70px; padding-bottom: 20px; }
-.char-area { position: relative; width: 100%; height: 70vh; display: flex; justify-content: center; align-items: flex-end; background: transparent !important; }
+/* OUTPOST */
+.outpost-content { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-right: 80px; padding-bottom: 20px; }
+.char-area { position: relative; width: 100%; height: 75vh; display: flex; justify-content: center; align-items: flex-end; background: transparent !important; }
 
-/* FIX: Removed mix-blend-mode. Using drop-shadow and mask to blend edges */
+/* Black Box Removal Magic */
 .main-char { 
   height: 100%; 
   object-fit: contain; 
   animation: float 4s ease-in-out infinite; 
-  filter: drop-shadow(0 0 20px rgba(0,243,255,0.3)); 
-  -webkit-mask-image: radial-gradient(circle, black 75%, transparent 100%); 
+  mix-blend-mode: screen; /* Crucial for removing the black box */
+  filter: contrast(1.2) brightness(1.1) drop-shadow(0 0 30px rgba(0,243,255,0.4)); 
+  -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%); 
   z-index: 5;
 }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -111,15 +105,15 @@ body { width: 100vw; height: 100vh; overflow: hidden; background: #020205; font-
 .card-locked img { filter: grayscale(100%) brightness(0.3); }
 .lock-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 35px; color: rgba(255,255,255,0.6); z-index: 3; }
 
-/* ARENA & BOSS (Keep mostly same) */
-.battle-hud { display: flex; justify-content: space-between; padding: 20px; margin-top: 50px; margin-right: 70px; z-index: 20; }
+/* ARENA & BOSS (Keep styling consistent) */
+.battle-hud { display: flex; justify-content: space-between; padding: 20px; margin-top: 50px; margin-right: 80px; z-index: 20; }
 .name-plate { font-family: 'Orbitron'; font-size: 14px; font-weight: bold; margin-bottom: 5px; }
 .hp-container { width: 110px; background: #111; border: 2px solid #555; height: 14px; border-radius: 4px; overflow: hidden; }
 .hp-fill { height: 100%; width: 100%; transition: width 0.3s; }
 .hp-player { background: var(--green); }
 .hp-enemy { background: #ef4444; float: right; }
 .vs-logo { font-family: 'Orbitron'; font-size: 30px; color: var(--gold); text-shadow: 0 0 20px var(--gold); }
-.arena-floor { flex: 1; position: relative; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 10px 50px 10px; margin-right: 70px; z-index: 10; }
+.arena-floor { flex: 1; position: relative; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 10px 50px 10px; margin-right: 80px; z-index: 10; }
 .fighter-container { position: relative; width: 50%; height: 100%; display: flex; justify-content: center; align-items: flex-end; }
 .fighter-img { width: 160px; height: 240px; object-fit: contain; mix-blend-mode: screen; filter: contrast(1.3) brightness(1.2) drop-shadow(0 0 20px rgba(0,243,255,0.6)); }
 .e-fighter-img { transform: scaleX(-1); filter: contrast(1.3) brightness(1.2) drop-shadow(0 0 20px rgba(255,0,255,0.6)); }
@@ -138,8 +132,8 @@ body { width: 100vw; height: 100vh; overflow: hidden; background: #020205; font-
 @keyframes shake { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-10px, 5px); } 50% { transform: translate(10px, -5px); } 75% { transform: translate(-10px, -5px); } }
 .dmg-text { position: absolute; font-family: 'Teko'; font-size: 50px; color: #ff2222; font-weight: bold; animation: floatUp 1s forwards; z-index: 50; text-shadow: 0 0 10px #000; }
 @keyframes floatUp { 0% { opacity: 1; transform: scale(0.5); } 100% { transform: translateY(-80px) scale(1); opacity: 0; } }
-.battle-controls { padding: 0 20px 20px 10px; margin-right: 70px; z-index: 20; }
-.boss-container, .vault-content { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 20px; padding: 20px; margin-right: 70px; z-index: 10; }
+.battle-controls { padding: 0 20px 20px 10px; margin-right: 80px; z-index: 20; }
+.boss-container, .vault-content { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 20px; padding: 20px; margin-right: 80px; z-index: 10; }
 .glow-magenta { font-family: 'Orbitron'; color: #fff; text-shadow: 0 0 15px var(--magenta); font-size: 26px; }
 .glow-cyan { font-family: 'Orbitron'; color: #fff; text-shadow: 0 0 15px var(--cyan); font-size: 26px; }
 .vault-card { background: rgba(0,0,0,0.8); padding: 20px; border: 1px solid var(--cyan); border-radius: 8px; width: 100%; font-family: 'Teko'; font-size: 20px; }
