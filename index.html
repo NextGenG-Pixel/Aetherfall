@@ -5,168 +5,119 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Aetherfall: Nexus Protocol</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=15.0">
+  <link rel="stylesheet" href="style.css?v=1.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
   <canvas id="particles-canvas"></canvas>
+  <div class="scanline"></div>
 
-  <!-- LOADING SCREEN -->
+  <!-- LOADING SCREEN (JPG ফিক্স) -->
   <div id="loading">
-    <div class="loader-logo">AETHERFALL</div>
-    <div class="loader-bar"><div class="loader-fill"></div></div>
+    <div class="loading-bg" style="background-image: url('assets/bg_loading.jpg');"></div>
+    <div class="loading-content">
+      <h1 class="loading-logo">AETHERFALL</h1>
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+      <p class="loading-tip">Connecting to orbital station...</p>
+    </div>
   </div>
 
-  <!-- TOP BAR (Glossy & Large) -->
-  <div class="top-bar">
-    <div class="profile-hud">
-      <img src="assets/char_default.png" class="profile-pic" onerror="this.src='https://via.placeholder.com/50'">
+  <!-- TOP HUD -->
+  <header class="top-hud">
+    <div class="profile-box">
+      <img src="assets/char_default.png" class="profile-img" onerror="this.src='https://via.placeholder.com/50/111/00f3ff'">
       <div class="level-badge">1</div>
     </div>
 
     <div class="resource-scroll">
-      <div class="res-pill">
+      <div class="res-item">
         <div class="icon-box"><img src="assets/icon_gem.png" onerror="this.src='https://via.placeholder.com/30/00f3ff/000000'"></div>
         <span id="ui-gems">50</span>
       </div>
-      <div class="res-pill">
-        <div class="icon-box"><img src="assets/token_iron.png" onerror="this.src='https://via.placeholder.com/30/888/000000'"></div>
+      <div class="res-item">
+        <div class="icon-box"><img src="assets/icon_iron.png" onerror="this.src='https://via.placeholder.com/30/888/000000'"></div>
         <span id="ui-iron">1000</span>
       </div>
-      <div class="res-pill">
-        <div class="icon-box"><img src="assets/token_titanium.png" onerror="this.src='https://via.placeholder.com/30/fff/000000?text=T'"></div>
+      <div class="res-item">
+        <div class="icon-box"><img src="assets/icon_titanium.png" onerror="this.src='https://via.placeholder.com/30/fff/000000'"></div>
         <span id="ui-tita">500</span>
       </div>
-      <div class="res-pill">
-        <div class="icon-box"><img src="assets/token_darkmatter.png" onerror="this.src='https://via.placeholder.com/30/f0f/000000'"></div>
+      <div class="res-item">
+        <div class="icon-box"><img src="assets/icon_dm.png" onerror="this.src='https://via.placeholder.com/30/f0f/000000'"></div>
         <span id="ui-dm">10</span>
       </div>
-      <div class="res-pill">
-        <div class="icon-box"><img src="assets/token_plasmacore.png" onerror="this.src='https://via.placeholder.com/30/f00/000000'"></div>
+      <div class="res-item">
+        <div class="icon-box"><img src="assets/icon_pc.png" onerror="this.src='https://via.placeholder.com/30/f00/000000'"></div>
         <span id="ui-pc">5</span>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- 1. OUTPOST (HOME SCREEN) -->
+  <!-- MAIN SCREEN: OUTPOST (BASE BUILDING - JPG ফিক্স) -->
   <div class="screen active" id="outpost">
-    <div class="bg" style="background-image: url('assets/bg_home.jpg');"></div>
-    <div class="bg-overlay"></div>
-    
-    <div class="outpost-content">
-      <div class="char-area">
-        <img src="assets/char_default.png" class="main-char" id="ui-main-char" onerror="this.src='https://via.placeholder.com/250/000000/00f3ff?text=CHAR'">
+    <!-- Isometric Base Background -->
+    <div class="base-map" style="background-image: url('assets/bg_base.jpg');">
+      <div class="map-grid-overlay"></div>
+      
+      <!-- Interactive Buildings (Buildings are PNG) -->
+      <div class="building-node" style="top: 30%; left: 40%;" onclick="openBuildingModal('Command Center', 'build_command.png')">
+        <img src="assets/build_command.png" class="building-img" onerror="this.style.display='none'">
+        <div class="building-shadow"></div>
+      </div>
+      
+      <div class="building-node" style="top: 55%; left: 20%;" onclick="openBuildingModal('Resource Storage', 'build_storage.png')">
+        <img src="assets/build_storage.png" class="building-img" onerror="this.style.display='none'">
+        <div class="building-shadow"></div>
+      </div>
+
+      <div class="building-node" style="top: 45%; right: 20%;" onclick="openBuildingModal('Shield Generator', 'build_shield.png')">
+        <img src="assets/build_shield.png" class="building-img" onerror="this.style.display='none'">
+        <div class="building-shadow"></div>
+      </div>
+
+      <div class="building-node" style="top: 65%; right: 35%;" onclick="openBuildingModal('Defense Turret', 'build_turret.png')">
+        <img src="assets/build_turret.png" class="building-img" onerror="this.style.display='none'">
+        <div class="building-shadow"></div>
       </div>
     </div>
   </div>
 
-  <!-- 2. ARMORY -->
-  <div class="screen" id="armory">
-    <div class="bg" style="background-image: url('assets/bg_page.jpg');"></div>
-    <div class="bg-overlay"></div>
-    <div class="armory-header">
-      <h1 class="total-power" id="ui-total-power">POWER: 0</h1>
-    </div>
-    <div class="inventory-grid" id="ui-inventory"></div>
-  </div>
-
-  <!-- 3. ARENA -->
-  <div class="screen" id="arena">
-    <div class="bg" style="background-image: url('assets/bg_battle.jpg');"></div>
-    <div class="bg-overlay"></div>
-    <div class="battle-hud">
-      <div><div class="name-plate glow-cyan">COMMANDER</div><div class="hp-container"><div class="hp-fill hp-player" id="p-hp"></div></div></div>
-      <div class="vs-logo">VS</div>
-      <div style="text-align:right;"><div class="name-plate glow-magenta">ENEMY</div><div class="hp-container"><div class="hp-fill hp-enemy" id="e-hp"></div></div></div>
-    </div>
-    <div class="arena-floor" id="arena-floor">
-      <div class="fighter-container">
-        <img class="fighter-img p-fighter-img" id="p-char-img" src="assets/char_default.png">
-        <img class="pet-img left-pet" id="p-pet-img" src="assets/pet_dog_normal.png">
-      </div>
-      <div class="fighter-container enemy-side">
-        <img class="fighter-img e-fighter-img" id="e-char-img" src="assets/char_enemy.png">
-        <img class="pet-img right-pet" id="e-pet-img" src="assets/pet_dragon_legendary.png">
-      </div>
-    </div>
-    <div class="battle-controls">
-      <button class="btn btn-magenta" onclick="startBattle()" id="btn-fight">START ATTACK</button>
-    </div>
-  </div>
-
-  <!-- 4. SECTOR -->
-  <div class="screen" id="sector">
-    <div class="bg" style="background-image: url('assets/bg_page.jpg');"></div>
-    <div class="bg-overlay"></div>
-    <div class="boss-container">
-      <h1 class="glow-magenta">MECH BOSS</h1>
-      <div class="hp-container" style="width: 100%; height: 24px; box-shadow: 0 0 20px red;"><div class="hp-fill hp-enemy" id="boss-hp" style="width:100%"></div></div>
-      <button class="btn btn-cyan" onclick="fightBoss()" id="btn-boss">ATTACK BOSS</button>
-    </div>
-  </div>
-
-  <!-- 5. VAULT -->
-  <div class="screen" id="vault">
-    <div class="bg" style="background-image: url('assets/bg_page.jpg');"></div>
-    <div class="bg-overlay"></div>
-    <div class="vault-content">
-      <h1 class="glow-cyan">$ATHF VAULT</h1>
-      <div class="vault-card">
-        <h3 style="color:var(--gold); margin-bottom:15px; font-family:'Orbitron';">REQUIREMENTS</h3>
-        <div class="vault-row"><span>Iron</span> <span>10,000 / 100k</span></div>
-        <div class="vault-row"><span>Titanium</span> <span>1,000 / 50k</span></div>
-        <div class="vault-row"><span>Dark Matter</span> <span>10 / 5k</span></div>
-        <div class="vault-row"><span>Plasma Core</span> <span>1 / 500</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL -->
-  <div id="upgrade-modal" class="modal">
-    <div class="modal-content">
-      <h2 id="modal-title" class="glow-cyan" style="margin-bottom:15px;">Item Name</h2>
-      <img id="modal-img" src="" style="width:140px; margin-bottom:20px; object-fit:contain; height:140px; filter: drop-shadow(0 0 20px var(--cyan));">
-      <p id="modal-desc" style="margin-bottom:20px;">Description</p>
-      <button class="btn btn-cyan" id="btn-modal-action">ACTION</button>
-      <button class="btn" style="margin-top:10px; background:#333; color:#aaa;" onclick="closeModal()">CANCEL</button>
-    </div>
-  </div>
-
-  <!-- RIGHT SIDE NAVIGATION (Advanced 3D Style) -->
-  <div class="right-nav">
-    <button class="nav-btn active" data-target="outpost" onclick="nav('outpost', this)">
-      <div class="nav-icon-wrapper">
-        <img src="assets/nav_outpost.png" onerror="this.src='https://via.placeholder.com/40'">
-      </div>
+  <!-- RIGHT NAVIGATION -->
+  <nav class="side-nav">
+    <button class="nav-item active" data-target="outpost">
+      <div class="nav-icon"><img src="assets/nav_outpost.png" onerror="this.src='https://via.placeholder.com/40'"></div>
       <span>Outpost</span>
     </button>
-    <button class="nav-btn" data-target="armory" onclick="nav('armory', this)">
-      <div class="nav-icon-wrapper">
-        <img src="assets/nav_armory.png" onerror="this.src='https://via.placeholder.com/40'">
-      </div>
+    <button class="nav-item" data-target="armory">
+      <div class="nav-icon"><img src="assets/nav_armory.png" onerror="this.src='https://via.placeholder.com/40'"></div>
       <span>Armory</span>
     </button>
-    <button class="nav-btn" data-target="sector" onclick="nav('sector', this)">
-      <div class="nav-icon-wrapper">
-        <img src="assets/nav_sector.png" onerror="this.src='https://via.placeholder.com/40'">
-      </div>
+    <button class="nav-item" data-target="sector">
+      <div class="nav-icon"><img src="assets/nav_sector.png" onerror="this.src='https://via.placeholder.com/40'"></div>
       <span>Sector</span>
     </button>
-    <button class="nav-btn" data-target="arena" onclick="nav('arena', this)">
-      <div class="nav-icon-wrapper">
-        <img src="assets/nav_arena.png" onerror="this.src='https://via.placeholder.com/40'">
-      </div>
+    <button class="nav-item" data-target="arena">
+      <div class="nav-icon"><img src="assets/nav_arena.png" onerror="this.src='https://via.placeholder.com/40'"></div>
       <span>Arena</span>
     </button>
-    <button class="nav-btn" data-target="vault" onclick="nav('vault', this)">
-      <div class="nav-icon-wrapper">
-        <img src="assets/nav_market.png" onerror="this.src='https://via.placeholder.com/40'">
-      </div>
+    <button class="nav-item" data-target="vault">
+      <div class="nav-icon"><img src="assets/nav_vault.png" onerror="this.src='https://via.placeholder.com/40'"></div>
       <span>Vault</span>
     </button>
+  </nav>
+
+  <!-- BUILDING MODAL -->
+  <div id="building-modal" class="modal">
+    <div class="modal-content">
+      <h2 id="modal-title" class="glow-cyan">Building</h2>
+      <img id="modal-img" src="" class="modal-img">
+      <p id="modal-desc">Upgrade to increase efficiency and power.</p>
+      <button class="btn btn-cyan" onclick="upgradeBuilding()">UPGRADE (Cost: 1000 Iron)</button>
+      <button class="btn btn-cancel" onclick="closeModal()">CANCEL</button>
+    </div>
   </div>
 
-  <script src="app.js?v=15.0"></script>
+  <script src="app.js?v=1.0"></script>
 </body>
 </html>
