@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Aetherfall: Nexus Protocol</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=1.0">
+  <link rel="stylesheet" href="style.css?v=3.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
   <canvas id="particles-canvas"></canvas>
-  <div class="scanline"></div>
 
-  <!-- LOADING SCREEN (JPG ফিক্স) -->
+  <!-- GLOBAL VIGNETTE (Screen edges darkened) -->
+  <div class="vignette"></div>
+
+  <!-- LOADING SCREEN -->
   <div id="loading">
     <div class="loading-bg" style="background-image: url('assets/bg_loading.jpg');"></div>
     <div class="loading-content">
@@ -31,93 +33,114 @@
     </div>
 
     <div class="resource-scroll">
-      <div class="res-item">
+      <div class="res-item" onclick="openMaterialModal('Gems', 'assets/icon_gem.png', 'Premium currency used to speed up upgrades and buy rare items.')">
         <div class="icon-box"><img src="assets/icon_gem.png" onerror="this.src='https://via.placeholder.com/30/00f3ff/000000'"></div>
         <span id="ui-gems">50</span>
       </div>
-      <div class="res-item">
+      <div class="res-item" onclick="openMaterialModal('Iron', 'assets/icon_iron.png', 'Basic building material. Mined continuously by Scavenger Drones.')">
         <div class="icon-box"><img src="assets/icon_iron.png" onerror="this.src='https://via.placeholder.com/30/888/000000'"></div>
         <span id="ui-iron">1000</span>
       </div>
-      <div class="res-item">
+      <div class="res-item" onclick="openMaterialModal('Titanium', 'assets/icon_titanium.png', 'Advanced material used for upgrading high-tier structures and weapons.')">
         <div class="icon-box"><img src="assets/icon_titanium.png" onerror="this.src='https://via.placeholder.com/30/fff/000000'"></div>
         <span id="ui-tita">500</span>
       </div>
-      <div class="res-item">
+      <div class="res-item" onclick="openMaterialModal('Dark Matter', 'assets/icon_dm.png', 'Rare cosmic material required for Mythic upgrades.')">
         <div class="icon-box"><img src="assets/icon_dm.png" onerror="this.src='https://via.placeholder.com/30/f0f/000000'"></div>
         <span id="ui-dm">10</span>
       </div>
-      <div class="res-item">
+      <div class="res-item" onclick="openMaterialModal('Plasma Core', 'assets/icon_pc.png', 'Ultra-rare energy core. Essential for top-tier progression.')">
         <div class="icon-box"><img src="assets/icon_pc.png" onerror="this.src='https://via.placeholder.com/30/f00/000000'"></div>
         <span id="ui-pc">5</span>
       </div>
     </div>
   </header>
 
-  <!-- MAIN SCREEN: OUTPOST (BASE BUILDING - JPG ফিক্স) -->
+  <!-- MAIN SCREEN: OUTPOST -->
   <div class="screen active" id="outpost">
-    <!-- Isometric Base Background -->
     <div class="base-map" style="background-image: url('assets/bg_base.jpg');">
       <div class="map-grid-overlay"></div>
       
-      <!-- Interactive Buildings (Buildings are PNG) -->
-      <div class="building-node" style="top: 30%; left: 40%;" onclick="openBuildingModal('Command Center', 'build_command.png')">
+      <!-- Building 1 -->
+      <div class="building-node" id="node-command" style="top: 20%; left: 50%; transform: translateX(-50%);" onclick="selectBuilding(this, 'Command Center', 'build_command.png')">
         <img src="assets/build_command.png" class="building-img" onerror="this.style.display='none'">
         <div class="building-shadow"></div>
+        <div class="selection-ring"></div>
       </div>
       
-      <div class="building-node" style="top: 55%; left: 20%;" onclick="openBuildingModal('Resource Storage', 'build_storage.png')">
+      <!-- Building 2 -->
+      <div class="building-node" id="node-storage" style="top: 45%; left: 15%;" onclick="selectBuilding(this, 'Resource Storage', 'build_storage.png')">
         <img src="assets/build_storage.png" class="building-img" onerror="this.style.display='none'">
         <div class="building-shadow"></div>
+        <div class="selection-ring"></div>
       </div>
 
-      <div class="building-node" style="top: 45%; right: 20%;" onclick="openBuildingModal('Shield Generator', 'build_shield.png')">
+      <!-- Building 3 -->
+      <div class="building-node" id="node-shield" style="top: 45%; right: 15%;" onclick="selectBuilding(this, 'Shield Generator', 'build_shield.png')">
         <img src="assets/build_shield.png" class="building-img" onerror="this.style.display='none'">
         <div class="building-shadow"></div>
+        <div class="selection-ring"></div>
       </div>
 
-      <div class="building-node" style="top: 65%; right: 35%;" onclick="openBuildingModal('Defense Turret', 'build_turret.png')">
+      <!-- Building 4 -->
+      <div class="building-node" id="node-turret" style="top: 70%; left: 50%; transform: translateX(-50%);" onclick="selectBuilding(this, 'Defense Turret', 'build_turret.png')">
         <img src="assets/build_turret.png" class="building-img" onerror="this.style.display='none'">
         <div class="building-shadow"></div>
+        <div class="selection-ring"></div>
       </div>
     </div>
   </div>
 
-  <!-- RIGHT NAVIGATION -->
-  <nav class="side-nav">
-    <button class="nav-item active" data-target="outpost">
-      <div class="nav-icon"><img src="assets/nav_outpost.png" onerror="this.src='https://via.placeholder.com/40'"></div>
-      <span>Outpost</span>
-    </button>
-    <button class="nav-item" data-target="armory">
-      <div class="nav-icon"><img src="assets/nav_armory.png" onerror="this.src='https://via.placeholder.com/40'"></div>
-      <span>Armory</span>
-    </button>
-    <button class="nav-item" data-target="sector">
-      <div class="nav-icon"><img src="assets/nav_sector.png" onerror="this.src='https://via.placeholder.com/40'"></div>
-      <span>Sector</span>
-    </button>
-    <button class="nav-item" data-target="arena">
-      <div class="nav-icon"><img src="assets/nav_arena.png" onerror="this.src='https://via.placeholder.com/40'"></div>
-      <span>Arena</span>
-    </button>
-    <button class="nav-item" data-target="vault">
-      <div class="nav-icon"><img src="assets/nav_vault.png" onerror="this.src='https://via.placeholder.com/40'"></div>
-      <span>Vault</span>
-    </button>
-  </nav>
+  <!-- RIGHT NAVIGATION DOCK -->
+  <div class="nav-dock">
+    <nav class="side-nav">
+      <button class="nav-item active" data-target="outpost">
+        <div class="nav-icon"><img src="assets/nav_outpost.png" onerror="this.src='https://via.placeholder.com/40'"></div>
+        <span>Outpost</span>
+      </button>
+      <button class="nav-item" data-target="armory">
+        <div class="nav-icon"><img src="assets/nav_armory.png" onerror="this.src='https://via.placeholder.com/40'"></div>
+        <span>Armory</span>
+      </button>
+      <button class="nav-item" data-target="sector">
+        <div class="nav-icon"><img src="assets/nav_sector.png" onerror="this.src='https://via.placeholder.com/40'"></div>
+        <span>Sector</span>
+      </button>
+      <button class="nav-item" data-target="arena">
+        <div class="nav-icon"><img src="assets/nav_arena.png" onerror="this.src='https://via.placeholder.com/40'"></div>
+        <span>Arena</span>
+      </button>
+      <button class="nav-item" data-target="vault">
+        <div class="nav-icon"><img src="assets/nav_vault.png" onerror="this.src='https://via.placeholder.com/40'"></div>
+        <span>Vault</span>
+      </button>
+    </nav>
+  </div>
 
-  <!-- BUILDING MODAL -->
-  <div id="building-modal" class="modal">
+  <!-- MODALS (Same as before) -->
+  <div id="material-modal" class="modal">
     <div class="modal-content">
-      <h2 id="modal-title" class="glow-cyan">Building</h2>
-      <img id="modal-img" src="" class="modal-img">
-      <p id="modal-desc">Upgrade to increase efficiency and power.</p>
-      <button class="btn btn-cyan" onclick="upgradeBuilding()">UPGRADE (Cost: 1000 Iron)</button>
-      <button class="btn btn-cancel" onclick="closeModal()">CANCEL</button>
+      <img id="mat-modal-img" src="" class="modal-img">
+      <h2 id="mat-modal-title" class="glow-cyan">Material</h2>
+      <p id="mat-modal-desc" class="modal-desc">Description</p>
+      <button class="btn btn-cancel" onclick="closeModals()">CLOSE</button>
     </div>
   </div>
 
-  <script src="app.js?v=1.0"></script>
+  <div id="building-modal" class="modal">
+    <div class="modal-content">
+      <h2 id="build-modal-title" class="glow-cyan">Building Name</h2>
+      <img id="build-modal-img" src="" class="modal-img">
+      <div class="building-stats">
+        <div class="stat-row"><span>Level:</span> <span id="build-level">1</span></div>
+        <div class="stat-row"><span>Specialty:</span> <span id="build-spec">Defense</span></div>
+        <p id="build-desc" class="build-desc">Short description.</p>
+      </div>
+      <button class="btn btn-cyan" id="btn-upgrade" onclick="upgradeBuilding()">UPGRADE</button>
+      <button class="btn btn-cancel" onclick="closeModals()">CANCEL</button>
+    </div>
+  </div>
+
+  <script src="app.js?v=3.0"></script>
 </body>
 </html>
