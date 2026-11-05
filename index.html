@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Aetherfall: Nexus Protocol</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=6.0">
+  <link rel="stylesheet" href="style.css?v=7.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -41,7 +41,6 @@
   <div class="screen active" id="outpost">
     <div class="base-map" style="background-image: url('assets/bg_base.jpg');" id="base-map">
       <div class="map-grid-overlay"></div>
-      <!-- Buildings will be dynamically injected here by JS -->
       <div id="building-container"></div>
     </div>
   </div>
@@ -56,7 +55,7 @@
     </nav>
   </div>
 
-  <!-- BOTTOM UI: BUILD MENU BUTTON & BUILDER STATUS -->
+  <!-- BOTTOM UI -->
   <div class="bottom-ui">
     <button class="action-btn" onclick="openBuildMenu()">
       <img src="assets/icon_build.png" onerror="this.style.display='none'">
@@ -72,9 +71,7 @@
   <div id="build-menu-modal" class="modal">
     <div class="modal-content" style="max-width: 90%; width: 400px;">
       <h2 class="glow-cyan">BUILDINGS</h2>
-      <div class="build-grid" id="build-grid">
-        <!-- Dynamically populated -->
-      </div>
+      <div class="build-grid" id="build-grid"></div>
       <button class="btn btn-cancel" onclick="closeModals()">CLOSE</button>
     </div>
   </div>
@@ -87,22 +84,47 @@
       
       <div class="building-stats">
         <div class="stat-row"><span>Level:</span> <span id="b-modal-level">1</span> / 15</div>
-        <div class="stat-row"><span id="b-modal-prod-label">Production:</span> <span id="b-modal-prod">0/min</span></div>
+        <div class="stat-row" id="b-modal-stat-row"><span id="b-modal-stat-label">Production:</span> <span id="b-modal-stat-val">0</span></div>
+        
+        <!-- Shows facility upgrade info -->
+        <div class="upgrade-info" id="b-modal-upgrade-info" style="display:none;">
+          <div style="color:#00ff88; font-size:12px;">Next Lvl: <span id="next-stat-val"></span></div>
+        </div>
+
         <div class="stat-row" id="b-modal-storage-row" style="display:none;"><span>Storage:</span> <span id="b-modal-storage">0/0</span></div>
+        <div class="stat-row" id="b-modal-time-row" style="color: #ff00ff; display:none;"><span>Time:</span> <span id="b-modal-time">0s</span></div>
       </div>
 
       <button class="btn btn-cyan" id="btn-claim" onclick="claimResources()" style="display:none;">CLAIM RESOURCES</button>
       
-      <div class="upgrade-costs">
+      <div class="upgrade-costs" id="b-modal-cost-container">
         <h4 style="color:var(--gold); font-size:12px; margin-bottom:5px;">Upgrade Costs:</h4>
         <div class="cost-grid" id="b-modal-costs"></div>
       </div>
 
-      <button class="btn btn-magenta" onclick="upgradeBuilding()">UPGRADE</button>
+      <button class="btn btn-magenta" id="btn-upgrade" onclick="upgradeBuilding()">UPGRADE</button>
       <button class="btn btn-cancel" onclick="closeModals()">CANCEL</button>
     </div>
   </div>
 
-  <script src="app.js?v=6.0"></script>
+  <!-- SIGNUP BONUS POPUP -->
+  <div id="signup-modal" class="modal">
+    <div class="modal-content" style="border-color: var(--gold); box-shadow: 0 0 50px rgba(252,226,5,0.4);">
+      <h2 class="glow-cyan" style="color:var(--gold); text-shadow: 0 0 10px var(--gold);">WELCOME COMMANDER!</h2>
+      <p style="color:#ddd; font-size:14px; margin-bottom:15px;">First Time Signup Bonus Received!</p>
+      
+      <div class="bonus-grid">
+        <div class="bonus-item"><img src="assets/icon_gem.png"> 100</div>
+        <div class="bonus-item"><img src="assets/icon_iron.png"> 100K</div>
+        <div class="bonus-item"><img src="assets/icon_titanium.png"> 10K</div>
+        <div class="bonus-item"><img src="assets/icon_dm.png"> 100</div>
+        <div class="bonus-item"><img src="assets/icon_pc.png"> 10</div>
+      </div>
+
+      <button class="btn btn-cyan" onclick="claimSignupBonus()" style="background:linear-gradient(180deg, #b38f00, #665200); color:white; border-color:gold;">CLAIM BONUS</button>
+    </div>
+  </div>
+
+  <script src="app.js?v=7.0"></script>
 </body>
 </html>
