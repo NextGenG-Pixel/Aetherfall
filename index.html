@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Aetherfall: Nexus Protocol</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7.0">
+  <link rel="stylesheet" href="style.css?v=8.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -37,6 +37,18 @@
     </div>
   </header>
 
+  <!-- NEW TOP CONTROLS (Moved from bottom) -->
+  <div class="top-controls">
+    <button class="action-btn" onclick="openBuildMenu()">
+      <img src="assets/icon_build.png" onerror="this.style.display='none'">
+      <span>BUILD</span>
+    </button>
+    <div class="builder-status">
+      <img src="assets/build_builderhut.png" style="width:24px; height:24px; object-fit:contain;">
+      <span id="ui-builder-text">1 / 3 Builders</span>
+    </div>
+  </div>
+
   <!-- MAIN SCREEN: OUTPOST -->
   <div class="screen active" id="outpost">
     <div class="base-map" style="background-image: url('assets/bg_base.jpg');" id="base-map">
@@ -45,7 +57,7 @@
     </div>
   </div>
 
-  <!-- RIGHT NAV DOCK -->
+  <!-- RIGHT NAV DOCK (Made Bigger) -->
   <div class="nav-dock">
     <nav class="side-nav">
       <button class="nav-item active"><div class="nav-icon"><img src="assets/nav_outpost.png"></div><span>Outpost</span></button>
@@ -53,18 +65,6 @@
       <button class="nav-item"><div class="nav-icon"><img src="assets/nav_sector.png"></div><span>Sector</span></button>
       <button class="nav-item"><div class="nav-icon"><img src="assets/nav_arena.png"></div><span>Arena</span></button>
     </nav>
-  </div>
-
-  <!-- BOTTOM UI -->
-  <div class="bottom-ui">
-    <button class="action-btn" onclick="openBuildMenu()">
-      <img src="assets/icon_build.png" onerror="this.style.display='none'">
-      <span>BUILD</span>
-    </button>
-    <div class="builder-status">
-      <img src="assets/build_builderhut.png" style="width:30px; height:30px; object-fit:contain;">
-      <span id="ui-builder-text">1 / 3 Builders Free</span>
-    </div>
   </div>
 
   <!-- BUILD MENU MODAL -->
@@ -86,7 +86,6 @@
         <div class="stat-row"><span>Level:</span> <span id="b-modal-level">1</span> / 15</div>
         <div class="stat-row" id="b-modal-stat-row"><span id="b-modal-stat-label">Production:</span> <span id="b-modal-stat-val">0</span></div>
         
-        <!-- Shows facility upgrade info -->
         <div class="upgrade-info" id="b-modal-upgrade-info" style="display:none;">
           <div style="color:#00ff88; font-size:12px;">Next Lvl: <span id="next-stat-val"></span></div>
         </div>
@@ -125,6 +124,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=7.0"></script>
+  <script src="app.js?v=8.0"></script>
 </body>
 </html>
