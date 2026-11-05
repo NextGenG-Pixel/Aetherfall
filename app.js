@@ -3,38 +3,37 @@ const gameData = {
   storage: { iron: 100000, titanium: 50000, dm: 5000, pc: 500, gems: 999999 },
   
   buildings: {
-    'cc': { name: 'Command Center', img: 'build_command.png', maxLvl: 15, baseCost: { iron: 3000, tita: 1000, dm: 0, pc: 0, gems: 5 }, unlockLvl: 1 },
-    'iron_miner': { name: 'Iron Miner', img: 'build_miner_iron.png', type: 'miner', res: 'iron', baseRate: 10, baseCap: 1000, maxLvl: 15, baseCost: { iron: 1000, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1 },
-    // FIXED: Renamed to build_storage.png
-    'iron_storage': { name: 'Iron Storage', img: 'build_storage.png', type: 'storage', res: 'iron', baseCap: 10000, maxLvl: 15, baseCost: { iron: 800, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1 },
-    'lab': { name: 'Research Lab', img: 'build_lab.png', maxLvl: 15, baseCost: { iron: 2500, tita: 800, dm: 0, pc: 0, gems: 5 }, unlockLvl: 1 },
+    'cc': { name: 'Command Center', img: 'build_command.png', maxLvl: 15, baseCost: { iron: 3000, tita: 1000, dm: 0, pc: 0, gems: 5 }, unlockLvl: 1, limit: 1 },
+    'iron_miner': { name: 'Iron Miner', img: 'build_miner_iron.png', type: 'miner', res: 'iron', baseRate: 10, baseCap: 1000, maxLvl: 15, baseCost: { iron: 1000, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1, limit: 4 },
+    'iron_storage': { name: 'Iron Storage', img: 'build_storage.png', type: 'storage', res: 'iron', baseCap: 10000, maxLvl: 15, baseCost: { iron: 800, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1, limit: 1 },
+    'lab': { name: 'Research Lab', img: 'build_lab.png', maxLvl: 15, baseCost: { iron: 2500, tita: 800, dm: 0, pc: 0, gems: 5 }, unlockLvl: 1, limit: 1 },
     
-    'tita_miner': { name: 'Tita Miner', img: 'build_miner_tita.png', type: 'miner', res: 'titanium', baseRate: 5, baseCap: 500, maxLvl: 15, baseCost: { iron: 2000, tita: 500, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2 },
-    'tita_storage': { name: 'Tita Storage', img: 'build_storage_tita.png', type: 'storage', res: 'titanium', baseCap: 5000, maxLvl: 15, baseCost: { iron: 1500, tita: 300, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2 },
+    'tita_miner': { name: 'Tita Miner', img: 'build_miner_tita.png', type: 'miner', res: 'titanium', baseRate: 5, baseCap: 500, maxLvl: 15, baseCost: { iron: 2000, tita: 500, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2, limit: 3 },
+    'tita_storage': { name: 'Tita Storage', img: 'build_storage_tita.png', type: 'storage', res: 'titanium', baseCap: 5000, maxLvl: 15, baseCost: { iron: 1500, tita: 300, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2, limit: 1 },
     
-    'turret': { name: 'Defense Turret', img: 'build_turret.png', maxLvl: 15, baseCost: { iron: 4000, tita: 1000, dm: 0, pc: 0, gems: 8 }, unlockLvl: 3 },
-    'shield': { name: 'Shield Generator', img: 'build_shield.png', maxLvl: 15, baseCost: { iron: 5000, tita: 1500, dm: 0, pc: 0, gems: 10 }, unlockLvl: 4 },
+    'turret': { name: 'Defense Turret', img: 'build_turret.png', maxLvl: 15, baseCost: { iron: 4000, tita: 1000, dm: 0, pc: 0, gems: 8 }, unlockLvl: 3, limit: 1 },
+    'shield': { name: 'Shield Generator', img: 'build_shield.png', maxLvl: 15, baseCost: { iron: 5000, tita: 1500, dm: 0, pc: 0, gems: 10 }, unlockLvl: 4, limit: 1 },
     
-    'dm_storage': { name: 'DM Storage', img: 'build_storage_dm.png', type: 'storage', res: 'dm', baseCap: 500, maxLvl: 15, baseCost: { iron: 10000, tita: 3000, dm: 50, pc: 0, gems: 15 }, unlockLvl: 5 },
-    'dm_miner': { name: 'DM Miner', img: 'build_miner_dm.png', type: 'miner', res: 'dm', baseRate: 1, baseCap: 50, maxLvl: 15, baseCost: { iron: 15000, tita: 4000, dm: 100, pc: 0, gems: 20 }, unlockLvl: 6 },
-    'pc_storage': { name: 'PC Storage', img: 'build_storage_pc.png', type: 'storage', res: 'pc', baseCap: 50, maxLvl: 15, baseCost: { iron: 20000, tita: 5000, dm: 200, pc: 5, gems: 25 }, unlockLvl: 6 },
+    'dm_storage': { name: 'DM Storage', img: 'build_storage_dm.png', type: 'storage', res: 'dm', baseCap: 500, maxLvl: 15, baseCost: { iron: 10000, tita: 3000, dm: 50, pc: 0, gems: 15 }, unlockLvl: 5, limit: 1 },
+    'dm_miner': { name: 'DM Miner', img: 'build_miner_dm.png', type: 'miner', res: 'dm', baseRate: 1, baseCap: 50, maxLvl: 15, baseCost: { iron: 15000, tita: 4000, dm: 100, pc: 0, gems: 20 }, unlockLvl: 6, limit: 2 },
+    'pc_storage': { name: 'PC Storage', img: 'build_storage_pc.png', type: 'storage', res: 'pc', baseCap: 50, maxLvl: 15, baseCost: { iron: 20000, tita: 5000, dm: 200, pc: 5, gems: 25 }, unlockLvl: 6, limit: 1 },
     
-    'clan': { name: 'Clan Citadel', img: 'build_clan.png', maxLvl: 15, baseCost: { iron: 50000, tita: 10000, dm: 300, pc: 10, gems: 50 }, unlockLvl: 7 },
-    'pet_house': { name: 'Pet House', img: 'build_pet_house.png', maxLvl: 15, baseCost: { iron: 30000, tita: 8000, dm: 150, pc: 5, gems: 40 }, unlockLvl: 8 },
+    'clan': { name: 'Clan Citadel', img: 'build_clan.png', maxLvl: 15, baseCost: { iron: 50000, tita: 10000, dm: 300, pc: 10, gems: 50 }, unlockLvl: 7, limit: 1 },
+    'pet_house': { name: 'Pet House', img: 'build_pet_house.png', maxLvl: 15, baseCost: { iron: 30000, tita: 8000, dm: 150, pc: 5, gems: 40 }, unlockLvl: 8, limit: 1 },
     
-    'pc_miner': { name: 'Plasma Miner', img: 'build_miner_pc.png', type: 'miner', res: 'pc', baseRate: 0.1, baseCap: 5, maxLvl: 15, baseCost: { iron: 60000, tita: 15000, dm: 400, pc: 20, gems: 60 }, unlockLvl: 9 },
+    'pc_miner': { name: 'Plasma Miner', img: 'build_miner_pc.png', type: 'miner', res: 'pc', baseRate: 0.1, baseCap: 5, maxLvl: 15, baseCost: { iron: 60000, tita: 15000, dm: 400, pc: 20, gems: 60 }, unlockLvl: 9, limit: 1 },
     
-    'turret_heavy': { name: 'Heavy Turret', img: 'build_turret_heavy.png', maxLvl: 15, baseCost: { iron: 100000, tita: 25000, dm: 600, pc: 30, gems: 80 }, unlockLvl: 10 },
-    'shield_advanced': { name: 'Advanced Shield', img: 'build_shield_advanced.png', maxLvl: 15, baseCost: { iron: 150000, tita: 40000, dm: 800, pc: 40, gems: 100 }, unlockLvl: 12 },
+    'turret_heavy': { name: 'Heavy Turret', img: 'build_turret_heavy.png', maxLvl: 15, baseCost: { iron: 100000, tita: 25000, dm: 600, pc: 30, gems: 80 }, unlockLvl: 10, limit: 1 },
+    'shield_advanced': { name: 'Advanced Shield', img: 'build_shield_advanced.png', maxLvl: 15, baseCost: { iron: 150000, tita: 40000, dm: 800, pc: 40, gems: 100 }, unlockLvl: 12, limit: 1 },
     
-    'orbital_cannon': { name: 'Orbital Cannon', img: 'build_orbital_cannon.png', maxLvl: 15, baseCost: { iron: 500000, tita: 100000, dm: 2000, pc: 100, gems: 250 }, unlockLvl: 15 }
+    'orbital_cannon': { name: 'Orbital Cannon', img: 'build_orbital_cannon.png', maxLvl: 15, baseCost: { iron: 500000, tita: 100000, dm: 2000, pc: 100, gems: 250 }, unlockLvl: 15, limit: 1 }
   }
 };
 
 // 2. INITIAL STATE
 let state = JSON.parse(localStorage.getItem('aetherfall_state')) || {
   ccLevel: 1,
-  resources: { gems: 500, iron: 15000, titanium: 2000, dm: 100, pc: 10 }, // Increased starting iron
+  resources: { gems: 500, iron: 15000, titanium: 2000, dm: 100, pc: 10 },
   buildersTotal: 1,
   placedBuildings: [
     { id: 'b_1', type: 'cc', level: 1, x: 50, y: 50 },
@@ -60,16 +59,11 @@ function getUpgradeCost(type, currentLevel) {
   };
 }
 
-// CoC Style Exponential Upgrade Time
 function getUpgradeTime(type, level) {
-  // Base time in seconds: 5 seconds for level 1 to 2. 
-  // Multiplier: 1.6^level
   const baseTime = 5; 
   let time = baseTime * Math.pow(1.6, level - 1);
-  if (type === 'cc') time *= 2; // CC takes twice as long
-  
-  // Add random variance based on building type
-  return Math.floor(time); // in seconds
+  if (type === 'cc') time *= 2; 
+  return Math.floor(time);
 }
 
 function formatTime(seconds) {
@@ -137,7 +131,7 @@ function updateUI() {
     let startX, startY;
     
     el.addEventListener('pointerdown', (e) => {
-      if (isUpgrading) return; // Can't drag while upgrading
+      if (isUpgrading) return; 
       startX = e.clientX; startY = e.clientY;
       isDragging = false;
       el.classList.add('dragging');
@@ -192,7 +186,6 @@ function openBuildingModal(building) {
   const claimBtn = document.getElementById('btn-claim');
   const btnUpgrade = document.getElementById('btn-upgrade');
 
-  // Base Data
   if (data.type === 'miner') {
     const stats = getMinerStats(building.type, building.level);
     statLabel.innerText = "Production:";
@@ -217,9 +210,7 @@ function openBuildingModal(building) {
     upgradeInfo.style.display = 'none';
   }
 
-  // Upgrade Logic
   if (isUpgrading) {
-    // Show remaining time
     timeRow.style.display = 'flex';
     const rem = Math.floor((building.finishTime - Date.now()) / 1000);
     document.getElementById('b-modal-time').innerText = formatTime(rem);
@@ -248,7 +239,6 @@ function openBuildingModal(building) {
       
       document.getElementById('b-modal-costs').innerHTML = costHtml;
       
-      // Show time required
       timeRow.style.display = 'flex';
       document.getElementById('b-modal-time').innerText = formatTime(timeReq);
     }
@@ -260,7 +250,7 @@ function openBuildingModal(building) {
 // 6. CLAIM LOGIC
 function claimResources() {
   const building = state.placedBuildings.find(b => b.id === currentSelectedBuildingId);
-  if(building.finishTime && building.finishTime > Date.now()) return; // Can't claim while upgrading
+  if(building.finishTime && building.finishTime > Date.now()) return; 
 
   const data = gameData.buildings[building.type];
   const resType = data.res;
@@ -289,16 +279,13 @@ function upgradeBuilding() {
   const building = state.placedBuildings.find(b => b.id === currentSelectedBuildingId);
   if (building.level >= 15) return;
 
-  // Check CC Lock Constraint
   if (building.type === 'cc') {
-    // Check if ALL other buildings are upgraded to current CC level
     const notMaxed = state.placedBuildings.some(b => b.type !== 'cc' && b.level < state.ccLevel);
     if (notMaxed) {
       alert("You must upgrade all other buildings to your current Command Center level first!");
       return;
     }
   } else {
-    // Check if building exceeds CC level
     if (building.level >= state.ccLevel) {
       alert("Upgrade your Command Center first to unlock higher levels for this building!");
       return;
@@ -308,14 +295,12 @@ function upgradeBuilding() {
   const cost = getUpgradeCost(building.type, building.level);
   
   if (state.resources.iron >= cost.iron && state.resources.titanium >= cost.tita && state.resources.dm >= cost.dm && state.resources.pc >= cost.pc && state.resources.gems >= cost.gems) {
-    // Deduct
     state.resources.iron -= cost.iron;
     state.resources.titanium -= cost.tita;
     state.resources.dm -= cost.dm;
     state.resources.pc -= cost.pc;
     state.resources.gems -= cost.gems;
     
-    // Start Timer
     const timeReq = getUpgradeTime(building.type, building.level);
     building.finishTime = Date.now() + (timeReq * 1000);
     
@@ -326,28 +311,36 @@ function upgradeBuilding() {
   }
 }
 
-// 8. BUILD MENU
+// 8. BUILD MENU (Added Limits)
 function openBuildMenu() {
   const grid = document.getElementById('build-grid');
   grid.innerHTML = '';
   
   for (let type in gameData.buildings) {
     const data = gameData.buildings[type];
-    if (type === 'cc' && state.placedBuildings.some(b => b.type === 'cc')) continue;
+    
+    // Check how many of this type user currently has
+    const currentCount = state.placedBuildings.filter(b => b.type === type).length;
+    const maxLimit = data.limit || 1;
     
     const isUnlocked = state.ccLevel >= data.unlockLvl;
-    
+    const isLimitReached = currentCount >= maxLimit;
+
     let card = document.createElement('div');
-    card.className = `build-card ${!isUnlocked ? 'locked' : ''}`;
+    card.className = `build-card ${(!isUnlocked || isLimitReached) ? 'locked' : ''}`;
+    
+    let lockText = "";
+    if (!isUnlocked) lockText = `🔒 CC Lvl ${data.unlockLvl}`;
+    else if (isLimitReached) lockText = `Max Built (${currentCount}/${maxLimit})`;
+
     card.innerHTML = `
       <img src="assets/${data.img}">
       <p>${data.name}</p>
-      ${!isUnlocked ? `<div class="lock-overlay"><span>🔒 CC Lvl ${data.unlockLvl}</span></div>` : ''}
+      ${(!isUnlocked || isLimitReached) ? `<div class="lock-overlay"><span>${lockText}</span></div>` : ''}
     `;
     
-    if (isUnlocked) {
+    if (isUnlocked && !isLimitReached) {
       card.onclick = () => {
-        // Instant place
         const newX = 20 + Math.random() * 60;
         const newY = 20 + Math.random() * 60;
         const newB = { id: 'b_' + Date.now(), type: type, level: 1, x: newX, y: newY, currentAmount: 0 };
@@ -380,7 +373,6 @@ setInterval(() => {
   state.placedBuildings.forEach(b => {
     const data = gameData.buildings[b.type];
     
-    // Check if upgrade finished
     if (b.finishTime && now >= b.finishTime) {
       b.level++;
       b.finishTime = null;
@@ -392,7 +384,6 @@ setInterval(() => {
       changed = true;
     }
     
-    // Mine resources (only if not upgrading)
     if (data.type === 'miner' && !b.finishTime) {
       const stats = getMinerStats(b.type, b.level);
       if (b.currentAmount < stats.cap) {
@@ -403,7 +394,6 @@ setInterval(() => {
     }
   });
 
-  // Update timer text on screen without re-rendering everything
   if (!changed) {
     state.placedBuildings.forEach(b => {
       if (b.finishTime) {
