@@ -22,13 +22,14 @@ const gameData = {
   }
 };
 
-// 2. STATE
-let state = JSON.parse(localStorage.getItem('aetherfall_state')) || {
+// 2. STATE (Fresh State Every Time)
+// NOTE: localStorage removed so it starts fresh on every refresh during testing.
+let state = {
   ccLevel: 1,
   resources: { gems: 500, iron: 15000, titanium: 2000, dm: 100, pc: 10 },
-  buildersTotal: 1, // Free builder at start
-  hasCyberBuilder: false, // From Cyber Pass
-  cyberBuilderExpiry: null, // Timestamp when cyber pass expires
+  buildersTotal: 1, 
+  hasCyberBuilder: false, 
+  cyberBuilderExpiry: null, 
   placedBuildings: [
     { id: 'b_1', type: 'cc', level: 1, x: 50, y: 50 },
     { id: 'b_2', type: 'iron_miner', level: 1, x: 30, y: 30, currentAmount: 0 },
@@ -38,7 +39,10 @@ let state = JSON.parse(localStorage.getItem('aetherfall_state')) || {
   ]
 };
 
-function saveGame() { localStorage.setItem('aetherfall_state', JSON.stringify(state)); }
+// LocalStorage Saving is disabled for testing.
+function saveGame() { 
+  // localStorage.setItem('aetherfall_state', JSON.stringify(state)); 
+}
 
 // 3. UTILITIES
 function getUpgradeCost(type, currentLevel) {
@@ -79,11 +83,10 @@ function getMinerStats(type, level) {
 }
 
 // ==========================================
-// 4. NEW: BUILDER LOGIC
+// 4. BUILDER LOGIC
 // ==========================================
 function getTotalBuilders() {
   let total = state.buildersTotal;
-  // Check if cyber builder is active
   if (state.hasCyberBuilder && state.cyberBuilderExpiry > Date.now()) {
     total += 1;
   }
@@ -92,7 +95,6 @@ function getTotalBuilders() {
 
 function getBusyBuilders() {
   const now = Date.now();
-  // A builder is busy if a building has a finishTime in the future
   return state.placedBuildings.filter(b => b.finishTime && b.finishTime > now).length;
 }
 
@@ -109,12 +111,10 @@ function updateUI() {
   document.getElementById('ui-pc').innerText = Math.floor(state.resources.pc);
   document.getElementById('ui-cc-level').innerText = state.ccLevel;
   
-  // Update Builder Text
   const free = getFreeBuilders();
   const total = getTotalBuilders();
   document.getElementById('ui-builder-text').innerText = `${free} / ${total} Free`;
   
-  // Optional: Colorize builder text if 0 free
   const bText = document.getElementById('builder-ui');
   if(free === 0) {
     bText.style.borderColor = 'var(--magenta)';
@@ -245,7 +245,6 @@ function openBuildingModal(building) {
       timeRow.style.display = 'flex';
       document.getElementById('b-modal-time').innerText = formatTime(timeReq);
       
-      // Show builder status in button
       if(getFreeBuilders() <= 0) {
         btnUpgrade.innerText = "NO FREE BUILDERS";
         btnUpgrade.style.opacity = '0.5';
@@ -280,12 +279,11 @@ function claimResources() {
   if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
 }
 
-// 8. UPGRADE (With Builder Check)
+// 8. UPGRADE
 function upgradeBuilding() {
   const building = state.placedBuildings.find(b => b.id === currentSelectedBuildingId);
   if (building.level >= 15) return;
 
-  // Check Builders
   if(getFreeBuilders() <= 0) {
     alert("All builders are busy! Wait for them to finish or buy a Cyber Pass.");
     return;
@@ -306,9 +304,6 @@ function upgradeBuilding() {
     const timeReq = getUpgradeTime(building.type, building.level);
     building.finishTime = Date.now() + (timeReq * 1000);
     
-    // Automatically use Cyber Builder if active, else normal builder
-    // (Our logic just counts total busy vs total available, so it works automatically)
-
     saveGame(); updateUI(); closeModals();
     if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
   } else {
@@ -409,21 +404,20 @@ setInterval(() => {
   if (changed) { saveGame(); updateUI(); }
 }, 1000);
 
-// 11. MISC
+// 11. ON LOAD (Always show signup bonus on fresh load)
 window.onload = () => {
   setTimeout(() => { document.getElementById('loading').classList.add('hide'); }, 1500);
-  if (!localStorage.getItem('has_claimed_bonus')) {
-    document.getElementById('signup-modal').style.display = 'flex';
-  } else {
-    updateUI();
-  }
+  
+  // Show Signup Modal every time because localStorage is removed
+  document.getElementById('signup-modal').style.display = 'flex';
 };
 
 function claimSignupBonus() {
   state.resources.gems += 100; state.resources.iron += 100000; state.resources.titanium += 10000;
   state.resources.dm += 100; state.resources.pc += 10;
-  localStorage.setItem('has_claimed_bonus', 'true');
-  saveGame(); updateUI();
+  
+  // Removed localStorage check
+  updateUI();
   document.getElementById('signup-modal').style.display = 'none';
 }
 
