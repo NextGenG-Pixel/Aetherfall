@@ -1,24 +1,24 @@
-// FORCE CLEAR ALL OLD SAVED DATA (Fixes Cache Issue)
+// FORCE CLEAR ALL OLD SAVED DATA
 localStorage.clear();
 
-// 1. GAME DATABASE
+// 1. GAME DATABASE (Final Exact Math)
 const gameData = {
-  storage: { iron: 100000, titanium: 50000, dm: 5000, pc: 500, gems: 999999 },
+  storage: { iron: 7200000, titanium: 2800000, dm: 580000, pc: 28000, gems: 999999 },
   buildings: {
     'cc': { name: 'Command Center', img: 'build_command.png', maxLvl: 15, baseCost: { iron: 3000, tita: 1000, dm: 0, pc: 0, gems: 5 }, unlockLvl: 1, maxAllowed: 1 },
-    'iron_miner': { name: 'Iron Miner', img: 'build_miner_iron.png', type: 'miner', res: 'iron', baseRate: 10, baseCap: 1000, maxLvl: 15, baseCost: { iron: 1000, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1, maxAllowed: 4 },
-    'iron_storage': { name: 'Iron Storage', img: 'build_storage.png', type: 'storage', res: 'iron', baseCap: 10000, maxLvl: 15, baseCost: { iron: 800, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1, maxAllowed: 1 },
+    'iron_miner': { name: 'Iron Miner', img: 'build_miner_iron.png', type: 'miner', res: 'iron', baseRate: 10, baseCap: 5000, maxLvl: 15, baseCost: { iron: 1000, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1, maxAllowed: 4 },
+    'tita_miner': { name: 'Tita Miner', img: 'build_miner_tita.png', type: 'miner', res: 'titanium', baseRate: 5, baseCap: 2500, maxLvl: 15, baseCost: { iron: 2000, tita: 500, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2, maxAllowed: 3 },
+    'dm_miner': { name: 'DM Miner', img: 'build_miner_dm.png', type: 'miner', res: 'dm', baseRate: 1, baseCap: 500, maxLvl: 15, baseCost: { iron: 15000, tita: 4000, dm: 100, pc: 0, gems: 20 }, unlockLvl: 6, maxAllowed: 2 },
+    'pc_miner': { name: 'Plasma Miner', img: 'build_miner_pc.png', type: 'miner', res: 'pc', baseRate: 0.1, baseCap: 50, maxLvl: 15, baseCost: { iron: 60000, tita: 15000, dm: 400, pc: 20, gems: 60 }, unlockLvl: 9, maxAllowed: 1 },
+    'iron_storage': { name: 'Iron Storage', img: 'build_storage.png', type: 'storage', res: 'iron', baseCap: 25000, maxLvl: 15, baseCost: { iron: 800, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1, maxAllowed: 1 },
+    'tita_storage': { name: 'Tita Storage', img: 'build_storage_tita.png', type: 'storage', res: 'titanium', baseCap: 10000, maxLvl: 15, baseCost: { iron: 1500, tita: 300, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2, maxAllowed: 1 },
+    'dm_storage': { name: 'DM Storage', img: 'build_storage_dm.png', type: 'storage', res: 'dm', baseCap: 2000, maxLvl: 15, baseCost: { iron: 10000, tita: 3000, dm: 50, pc: 0, gems: 15 }, unlockLvl: 5, maxAllowed: 1 },
+    'pc_storage': { name: 'PC Storage', img: 'build_storage_pc.png', type: 'storage', res: 'pc', baseCap: 100, maxLvl: 15, baseCost: { iron: 20000, tita: 5000, dm: 200, pc: 5, gems: 25 }, unlockLvl: 6, maxAllowed: 1 },
     'lab': { name: 'Research Lab', img: 'build_lab.png', maxLvl: 15, baseCost: { iron: 2500, tita: 800, dm: 0, pc: 0, gems: 5 }, unlockLvl: 1, maxAllowed: 1 },
-    'tita_miner': { name: 'Tita Miner', img: 'build_miner_tita.png', type: 'miner', res: 'titanium', baseRate: 5, baseCap: 500, maxLvl: 15, baseCost: { iron: 2000, tita: 500, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2, maxAllowed: 3 },
-    'tita_storage': { name: 'Tita Storage', img: 'build_storage_tita.png', type: 'storage', res: 'titanium', baseCap: 5000, maxLvl: 15, baseCost: { iron: 1500, tita: 300, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2, maxAllowed: 1 },
     'turret': { name: 'Defense Turret', img: 'build_turret.png', maxLvl: 15, baseCost: { iron: 4000, tita: 1000, dm: 0, pc: 0, gems: 8 }, unlockLvl: 3, maxAllowed: 1 },
     'shield': { name: 'Shield Generator', img: 'build_shield.png', maxLvl: 15, baseCost: { iron: 5000, tita: 1500, dm: 0, pc: 0, gems: 10 }, unlockLvl: 4, maxAllowed: 1 },
-    'dm_storage': { name: 'DM Storage', img: 'build_storage_dm.png', type: 'storage', res: 'dm', baseCap: 500, maxLvl: 15, baseCost: { iron: 10000, tita: 3000, dm: 50, pc: 0, gems: 15 }, unlockLvl: 5, maxAllowed: 1 },
-    'dm_miner': { name: 'DM Miner', img: 'build_miner_dm.png', type: 'miner', res: 'dm', baseRate: 1, baseCap: 50, maxLvl: 15, baseCost: { iron: 15000, tita: 4000, dm: 100, pc: 0, gems: 20 }, unlockLvl: 6, maxAllowed: 2 },
-    'pc_storage': { name: 'PC Storage', img: 'build_storage_pc.png', type: 'storage', res: 'pc', baseCap: 50, maxLvl: 15, baseCost: { iron: 20000, tita: 5000, dm: 200, pc: 5, gems: 25 }, unlockLvl: 6, maxAllowed: 1 },
     'clan': { name: 'Clan Citadel', img: 'build_clan.png', maxLvl: 15, baseCost: { iron: 50000, tita: 10000, dm: 300, pc: 10, gems: 50 }, unlockLvl: 7, maxAllowed: 1 },
     'pet_house': { name: 'Pet House', img: 'build_pet_house.png', maxLvl: 15, baseCost: { iron: 30000, tita: 8000, dm: 150, pc: 5, gems: 40 }, unlockLvl: 8, maxAllowed: 1 },
-    'pc_miner': { name: 'Plasma Miner', img: 'build_miner_pc.png', type: 'miner', res: 'pc', baseRate: 0.1, baseCap: 5, maxLvl: 15, baseCost: { iron: 60000, tita: 15000, dm: 400, pc: 20, gems: 60 }, unlockLvl: 9, maxAllowed: 1 },
     'turret_heavy': { name: 'Heavy Turret', img: 'build_turret_heavy.png', maxLvl: 15, baseCost: { iron: 100000, tita: 25000, dm: 600, pc: 30, gems: 80 }, unlockLvl: 10, maxAllowed: 1 },
     'shield_advanced': { name: 'Advanced Shield', img: 'build_shield_advanced.png', maxLvl: 15, baseCost: { iron: 150000, tita: 40000, dm: 800, pc: 40, gems: 100 }, unlockLvl: 12, maxAllowed: 1 },
     'orbital_cannon': { name: 'Orbital Cannon', img: 'build_orbital_cannon.png', maxLvl: 15, baseCost: { iron: 500000, tita: 100000, dm: 2000, pc: 100, gems: 250 }, unlockLvl: 15, maxAllowed: 1 }
@@ -29,9 +29,7 @@ const gameData = {
 let state = {
   ccLevel: 1,
   resources: { gems: 500, iron: 15000, titanium: 2000, dm: 100, pc: 10 },
-  buildersTotal: 1, 
-  hasCyberBuilder: false, 
-  cyberBuilderExpiry: null, 
+  buildersTotal: 1, hasCyberBuilder: false, cyberBuilderExpiry: null, 
   placedBuildings: [
     { id: 'b_1', type: 'cc', level: 1, x: 50, y: 50 },
     { id: 'b_2', type: 'iron_miner', level: 1, x: 30, y: 30, currentAmount: 0 },
@@ -41,21 +39,15 @@ let state = {
   ]
 };
 
-// LocalStorage Saving is disabled for testing.
-function saveGame() { 
-  // localStorage.setItem('aetherfall_state', JSON.stringify(state)); 
-}
+function saveGame() { }
 
 // 3. UTILITIES
 function getUpgradeCost(type, currentLevel) {
   const base = gameData.buildings[type].baseCost;
   const multiplier = Math.pow(1.5, currentLevel - 1); 
   return {
-    iron: Math.floor(base.iron * multiplier),
-    tita: Math.floor(base.tita * multiplier),
-    dm: Math.floor(base.dm * multiplier),
-    pc: Math.floor(base.pc * multiplier),
-    gems: Math.floor(base.gems * multiplier)
+    iron: Math.floor(base.iron * multiplier), tita: Math.floor(base.tita * multiplier),
+    dm: Math.floor(base.dm * multiplier), pc: Math.floor(base.pc * multiplier), gems: Math.floor(base.gems * multiplier)
   };
 }
 
@@ -80,29 +72,20 @@ function formatTime(seconds) {
 
 function getMinerStats(type, level) {
   const data = gameData.buildings[type];
-  const multiplier = Math.pow(1.2, level - 1); 
+  const multiplier = Math.pow(1.25, level - 1); 
   return { rate: data.baseRate * multiplier, cap: Math.floor(data.baseCap * multiplier) };
 }
 
-// ==========================================
 // 4. BUILDER LOGIC
-// ==========================================
 function getTotalBuilders() {
   let total = state.buildersTotal;
-  if (state.hasCyberBuilder && state.cyberBuilderExpiry > Date.now()) {
-    total += 1;
-  }
+  if (state.hasCyberBuilder && state.cyberBuilderExpiry > Date.now()) total += 1;
   return total;
 }
-
 function getBusyBuilders() {
-  const now = Date.now();
-  return state.placedBuildings.filter(b => b.finishTime && b.finishTime > now).length;
+  return state.placedBuildings.filter(b => b.finishTime && b.finishTime > Date.now()).length;
 }
-
-function getFreeBuilders() {
-  return getTotalBuilders() - getBusyBuilders();
-}
+function getFreeBuilders() { return getTotalBuilders() - getBusyBuilders(); }
 
 // 5. UI UPDATER
 function updateUI() {
@@ -118,13 +101,8 @@ function updateUI() {
   document.getElementById('ui-builder-text').innerText = `${free} / ${total} Free`;
   
   const bText = document.getElementById('builder-ui');
-  if(free === 0) {
-    bText.style.borderColor = 'var(--magenta)';
-    bText.style.color = 'var(--magenta)';
-  } else {
-    bText.style.borderColor = '#555';
-    bText.style.color = 'var(--gold)';
-  }
+  if(free === 0) { bText.style.borderColor = 'var(--magenta)'; bText.style.color = 'var(--magenta)'; }
+  else { bText.style.borderColor = '#555'; bText.style.color = 'var(--gold)'; }
 
   const container = document.getElementById('building-container');
   container.innerHTML = '';
@@ -151,18 +129,24 @@ function updateUI() {
 
     el.innerHTML = `${timerText}<img src="assets/${data.img}" class="building-img">`;
     
-    let isDragging = false, startX, startY;
+    let isDragging = false, startX, startY, movedDist = 0;
     
     el.addEventListener('pointerdown', (e) => {
       if (isUpgrading) return;
       startX = e.clientX; startY = e.clientY;
-      isDragging = false; el.classList.add('dragging');
+      isDragging = false; movedDist = 0;
+      el.classList.add('dragging');
       el.setPointerCapture(e.pointerId);
     });
 
     el.addEventListener('pointermove', (e) => {
       if (!el.hasPointerCapture(e.pointerId) || isUpgrading) return;
-      if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) {
+      
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      movedDist = Math.sqrt(dx*dx + dy*dy);
+
+      if (movedDist > 15) { // Threshold for drag
         isDragging = true;
         const mapRect = document.getElementById('base-map').getBoundingClientRect();
         let newX = ((e.clientX - mapRect.left) / mapRect.width) * 100;
@@ -174,7 +158,12 @@ function updateUI() {
 
     el.addEventListener('pointerup', (e) => {
       el.classList.remove('dragging'); el.releasePointerCapture(e.pointerId);
-      if (isDragging) saveGame(); else openBuildingModal(b);
+      if (isDragging) {
+        saveGame(); // Just save position
+      } else {
+        // It was a click (movedDist < 15)
+        openBuildingModal(b);
+      }
     });
 
     container.appendChild(el);
@@ -281,7 +270,7 @@ function claimResources() {
   if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
 }
 
-// 8. UPGRADE
+// 8. UPGRADE (With Animation)
 function upgradeBuilding() {
   const building = state.placedBuildings.find(b => b.id === currentSelectedBuildingId);
   if (building.level >= 15) return;
@@ -306,6 +295,13 @@ function upgradeBuilding() {
     const timeReq = getUpgradeTime(building.type, building.level);
     building.finishTime = Date.now() + (timeReq * 1000);
     
+    // Trigger Upgrade Start Animation
+    const el = document.getElementById(building.id);
+    if(el) {
+      el.classList.add('upgrade-start-anim');
+      setTimeout(() => el.classList.remove('upgrade-start-anim'), 1000);
+    }
+
     saveGame(); updateUI(); closeModals();
     if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
   } else {
@@ -317,7 +313,6 @@ function upgradeBuilding() {
 function openBuildMenu() {
   const grid = document.getElementById('build-grid');
   grid.innerHTML = '';
-  
   for (let type in gameData.buildings) {
     const data = gameData.buildings[type];
     const currentCount = state.placedBuildings.filter(b => b.type === type).length;
@@ -329,7 +324,7 @@ function openBuildMenu() {
     card.innerHTML = `
       <img src="assets/${data.img}">
       <p>${data.name}</p>
-      <p style="font-size:9px; color:${isMaxed ? 'var(--magenta)' : 'var(--gold)'};">${currentCount}/${data.maxAllowed}</p>
+      <p style="font-size:10px; color:${isMaxed ? 'var(--magenta)' : 'var(--gold)'};">${currentCount}/${data.maxAllowed}</p>
       ${!isUnlocked ? `<div class="lock-overlay"><span>🔒 CC Lvl ${data.unlockLvl}</span></div>` : ''}
     `;
     
@@ -339,7 +334,6 @@ function openBuildMenu() {
         const newY = 20 + Math.random() * 60;
         const newB = { id: 'b_' + Date.now(), type: type, level: 1, x: newX, y: newY, currentAmount: 0 };
         const cost = getUpgradeCost(type, 0);
-        
         if (state.resources.iron >= cost.iron && state.resources.gems >= cost.gems) {
            state.resources.iron -= cost.iron; state.resources.gems -= cost.gems;
            state.placedBuildings.push(newB);
@@ -360,28 +354,63 @@ function closeModals() {
   document.getElementById('building-modal').style.display = 'none';
 }
 
-// 10. GAME LOOP
+// 10. SHOW UPGRADE COMPLETE CARD
+function showUpgradeComplete(building) {
+  const data = gameData.buildings[building.type];
+  document.getElementById('uc-title').innerText = data.name;
+  document.getElementById('uc-img').src = `assets/${data.img}`;
+  document.getElementById('uc-level').innerText = `Level ${building.level} Reached!`;
+  
+  let desc = "New utility unlocked!";
+  if (data.type === 'miner') {
+    const stats = getMinerStats(building.type, building.level);
+    desc = `Production increased to ${stats.rate.toFixed(1)}/min and capacity expanded to ${stats.cap}.`;
+  } else if (data.type === 'storage') {
+    desc = `Storage capacity expanded. You can now hold more resources.`;
+  }
+  
+  document.getElementById('uc-desc').innerText = desc;
+  document.getElementById('upgrade-complete-modal').style.display = 'flex';
+  
+  if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+}
+
+function closeUpgradeComplete() {
+  document.getElementById('upgrade-complete-modal').style.display = 'none';
+}
+
+// 11. GAME LOOP (Handles Timer Finish)
 setInterval(() => {
   let changed = false;
   const now = Date.now();
 
   state.placedBuildings.forEach(b => {
     const data = gameData.buildings[b.type];
+    
+    // Check if upgrade finished
     if (b.finishTime && now >= b.finishTime) {
       b.level++; b.finishTime = null;
+      
       if (b.type === 'cc') {
         state.ccLevel = b.level;
-        if(state.ccLevel === 5) {
-          state.buildersTotal = 2;
-          alert("Congratulations! Level 5 Reached. 2nd Builder Unlocked!");
-        }
-        if(state.ccLevel === 10) {
-          state.buildersTotal = 3;
-          alert("Congratulations! Level 10 Reached. 3rd Builder Unlocked!");
-        }
+        if(state.ccLevel === 5) state.buildersTotal = 2;
+        if(state.ccLevel === 10) state.buildersTotal = 3;
       }
+      
+      // Trigger Animation
+      const el = document.getElementById(b.id);
+      if(el) {
+        el.classList.add('upgrade-finish-anim');
+        setTimeout(() => el.classList.remove('upgrade-finish-anim'), 1500);
+      }
+
+      // Show Upgrade Complete Card
+      showUpgradeComplete(b);
+      
       changed = true;
     }
+    
+    // Mine resources
     if (data.type === 'miner' && !b.finishTime) {
       const stats = getMinerStats(b.type, b.level);
       if (b.currentAmount < stats.cap) {
@@ -406,22 +435,19 @@ setInterval(() => {
   if (changed) { saveGame(); updateUI(); }
 }, 1000);
 
-// 11. ON LOAD 
+// 12. ON LOAD 
 window.onload = () => {
   setTimeout(() => { document.getElementById('loading').classList.add('hide'); }, 1500);
-  
-  // Always show signup modal
   document.getElementById('signup-modal').style.display = 'flex';
 };
 
 function claimSignupBonus() {
   state.resources.gems += 100; state.resources.iron += 100000; state.resources.titanium += 10000;
   state.resources.dm += 100; state.resources.pc += 10;
-  
   updateUI();
   document.getElementById('signup-modal').style.display = 'none';
 }
 
 function showBuilderInfo() {
-  alert(`Available Builders: ${getFreeBuilders()} / ${getTotalBuilders()}\n\nBuilders are required to upgrade buildings.\n\nCyber Pass can provide a temporary extra builder.`);
+  alert(`Available Builders: ${getFreeBuilders()} / ${getTotalBuilders()}\n\nBuilders are required to upgrade buildings.`);
 }
