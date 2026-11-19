@@ -1,432 +1,137 @@
-// 1. GAME DATABASE
-const gameData = {
-  storage: { iron: 100000, titanium: 50000, dm: 5000, pc: 500, gems: 999999 },
-  buildings: {
-    'cc': { name: 'Command Center', img: 'build_command.png', maxLvl: 15, baseCost: { iron: 3000, tita: 1000, dm: 0, pc: 0, gems: 5 }, unlockLvl: 1, maxAllowed: 1 },
-    'iron_miner': { name: 'Iron Miner', img: 'build_miner_iron.png', type: 'miner', res: 'iron', baseRate: 10, baseCap: 1000, maxLvl: 15, baseCost: { iron: 1000, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1, maxAllowed: 4 },
-    'iron_storage': { name: 'Iron Storage', img: 'build_storage.png', type: 'storage', res: 'iron', baseCap: 10000, maxLvl: 15, baseCost: { iron: 800, tita: 0, dm: 0, pc: 0, gems: 2 }, unlockLvl: 1, maxAllowed: 1 },
-    'lab': { name: 'Research Lab', img: 'build_lab.png', maxLvl: 15, baseCost: { iron: 2500, tita: 800, dm: 0, pc: 0, gems: 5 }, unlockLvl: 1, maxAllowed: 1 },
-    'tita_miner': { name: 'Tita Miner', img: 'build_miner_tita.png', type: 'miner', res: 'titanium', baseRate: 5, baseCap: 500, maxLvl: 15, baseCost: { iron: 2000, tita: 500, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2, maxAllowed: 3 },
-    'tita_storage': { name: 'Tita Storage', img: 'build_storage_tita.png', type: 'storage', res: 'titanium', baseCap: 5000, maxLvl: 15, baseCost: { iron: 1500, tita: 300, dm: 0, pc: 0, gems: 3 }, unlockLvl: 2, maxAllowed: 1 },
-    'turret': { name: 'Defense Turret', img: 'build_turret.png', maxLvl: 15, baseCost: { iron: 4000, tita: 1000, dm: 0, pc: 0, gems: 8 }, unlockLvl: 3, maxAllowed: 1 },
-    'shield': { name: 'Shield Generator', img: 'build_shield.png', maxLvl: 15, baseCost: { iron: 5000, tita: 1500, dm: 0, pc: 0, gems: 10 }, unlockLvl: 4, maxAllowed: 1 },
-    'dm_storage': { name: 'DM Storage', img: 'build_storage_dm.png', type: 'storage', res: 'dm', baseCap: 500, maxLvl: 15, baseCost: { iron: 10000, tita: 3000, dm: 50, pc: 0, gems: 15 }, unlockLvl: 5, maxAllowed: 1 },
-    'dm_miner': { name: 'DM Miner', img: 'build_miner_dm.png', type: 'miner', res: 'dm', baseRate: 1, baseCap: 50, maxLvl: 15, baseCost: { iron: 15000, tita: 4000, dm: 100, pc: 0, gems: 20 }, unlockLvl: 6, maxAllowed: 2 },
-    'pc_storage': { name: 'PC Storage', img: 'build_storage_pc.png', type: 'storage', res: 'pc', baseCap: 50, maxLvl: 15, baseCost: { iron: 20000, tita: 5000, dm: 200, pc: 5, gems: 25 }, unlockLvl: 6, maxAllowed: 1 },
-    'clan': { name: 'Clan Citadel', img: 'build_clan.png', maxLvl: 15, baseCost: { iron: 50000, tita: 10000, dm: 300, pc: 10, gems: 50 }, unlockLvl: 7, maxAllowed: 1 },
-    'pet_house': { name: 'Pet House', img: 'build_pet_house.png', maxLvl: 15, baseCost: { iron: 30000, tita: 8000, dm: 150, pc: 5, gems: 40 }, unlockLvl: 8, maxAllowed: 1 },
-    'pc_miner': { name: 'Plasma Miner', img: 'build_miner_pc.png', type: 'miner', res: 'pc', baseRate: 0.1, baseCap: 5, maxLvl: 15, baseCost: { iron: 60000, tita: 15000, dm: 400, pc: 20, gems: 60 }, unlockLvl: 9, maxAllowed: 1 },
-    'turret_heavy': { name: 'Heavy Turret', img: 'build_turret_heavy.png', maxLvl: 15, baseCost: { iron: 100000, tita: 25000, dm: 600, pc: 30, gems: 80 }, unlockLvl: 10, maxAllowed: 1 },
-    'shield_advanced': { name: 'Advanced Shield', img: 'build_shield_advanced.png', maxLvl: 15, baseCost: { iron: 150000, tita: 40000, dm: 800, pc: 40, gems: 100 }, unlockLvl: 12, maxAllowed: 1 },
-    'orbital_cannon': { name: 'Orbital Cannon', img: 'build_orbital_cannon.png', maxLvl: 15, baseCost: { iron: 500000, tita: 100000, dm: 2000, pc: 100, gems: 250 }, unlockLvl: 15, maxAllowed: 1 }
-  }
-};
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Teko:wght@500;700&display=swap');
 
-// 2. STATE
-let state = JSON.parse(localStorage.getItem('aetherfall_state')) || {
-  ccLevel: 1,
-  resources: { gems: 500, iron: 15000, titanium: 2000, dm: 100, pc: 10 },
-  buildersTotal: 1, // Free builder at start
-  hasCyberBuilder: false, // From Cyber Pass
-  cyberBuilderExpiry: null, // Timestamp when cyber pass expires
-  placedBuildings: [
-    { id: 'b_1', type: 'cc', level: 1, x: 50, y: 50 },
-    { id: 'b_2', type: 'iron_miner', level: 1, x: 30, y: 30, currentAmount: 0 },
-    { id: 'b_3', type: 'iron_miner', level: 1, x: 70, y: 30, currentAmount: 0 },
-    { id: 'b_4', type: 'iron_storage', level: 1, x: 30, y: 70 },
-    { id: 'b_5', type: 'lab', level: 1, x: 70, y: 70 }
-  ]
-};
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
 
-function saveGame() { localStorage.setItem('aetherfall_state', JSON.stringify(state)); }
-
-// 3. UTILITIES
-function getUpgradeCost(type, currentLevel) {
-  const base = gameData.buildings[type].baseCost;
-  const multiplier = Math.pow(1.5, currentLevel - 1); 
-  return {
-    iron: Math.floor(base.iron * multiplier),
-    tita: Math.floor(base.tita * multiplier),
-    dm: Math.floor(base.dm * multiplier),
-    pc: Math.floor(base.pc * multiplier),
-    gems: Math.floor(base.gems * multiplier)
-  };
+:root { 
+  --cyan: #00f3ff; 
+  --magenta: #ff00ff; 
+  --gold: #fce205; 
+  --glass: rgba(10, 20, 35, 0.9); 
 }
 
-function getUpgradeTime(type, level) {
-  const baseTime = 5; 
-  let time = baseTime * Math.pow(1.6, level - 1);
-  if (type === 'cc') time *= 2;
-  return Math.floor(time);
+body { 
+  width: 100vw; 
+  height: 100vh; 
+  overflow: hidden; 
+  background: #020205; 
+  font-family: 'Share Tech Mono', monospace; 
+  color: #fff; 
 }
 
-function formatTime(seconds) {
-  if(seconds <= 0) return "0s";
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  let str = "";
-  if (h > 0) str += `${h}h `;
-  if (m > 0) str += `${m}m `;
-  if (s > 0) str += `${s}s`;
-  return str.trim();
+.vignette { 
+  position: fixed; 
+  inset: 0; 
+  z-index: 5; 
+  pointer-events: none; 
+  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.8) 100%); 
 }
 
-function getMinerStats(type, level) {
-  const data = gameData.buildings[type];
-  const multiplier = Math.pow(1.2, level - 1); 
-  return { rate: data.baseRate * multiplier, cap: Math.floor(data.baseCap * multiplier) };
+#particles-canvas { 
+  position: fixed; 
+  inset: 0; 
+  z-index: 1; 
+  pointer-events: none; 
+  opacity: 0.5; 
 }
 
-// ==========================================
-// 4. NEW: BUILDER LOGIC
-// ==========================================
-function getTotalBuilders() {
-  let total = state.buildersTotal;
-  // Check if cyber builder is active
-  if (state.hasCyberBuilder && state.cyberBuilderExpiry > Date.now()) {
-    total += 1;
-  }
-  return total;
-}
+/* ─── LOADING SCREEN ─── */
+#loading { position: fixed; inset: 0; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
+#loading.hide { opacity: 0; pointer-events: none; }
+.loading-bg { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: -1; }
+.loading-bg::after { content: ''; position: absolute; inset: 0; background: rgba(2, 2, 5, 0.6); }
+.loading-content { text-align: center; }
+.loading-logo { font-family: 'Orbitron'; font-size: 36px; font-weight: 900; color: #fff; text-shadow: 0 0 20px var(--cyan); letter-spacing: 5px; margin-bottom: 20px; }
+.loader-bar { width: 250px; height: 6px; background: rgba(0,0,0,0.8); border: 1px solid var(--cyan); border-radius: 4px; overflow: hidden; margin: 0 auto; }
+.loader-fill { width: 0%; height: 100%; background: var(--cyan); box-shadow: 0 0 15px var(--cyan); animation: loadAnim 2s infinite; }
+@keyframes loadAnim { 0% { width: 0; } 50% { width: 100%; } 100% { width: 0; left: 100%; } }
 
-function getBusyBuilders() {
-  const now = Date.now();
-  // A builder is busy if a building has a finishTime in the future
-  return state.placedBuildings.filter(b => b.finishTime && b.finishTime > now).length;
-}
+/* ─── TOP HUD (Header) ─── */
+.top-hud { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+.top-row-1 { display: flex; gap: 10px; align-items: center; }
+.profile-box { position: relative; }
+.profile-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--cyan); box-shadow: 0 0 15px rgba(0,243,255,0.6); object-fit: cover; background: #000; }
+.level-badge { position: absolute; bottom: -5px; right: -5px; background: var(--gold); color: #000; font-family: 'Orbitron'; font-size: 12px; font-weight: bold; padding: 2px 8px; border-radius: 10px; box-shadow: 0 0 10px var(--gold); }
 
-function getFreeBuilders() {
-  return getTotalBuilders() - getBusyBuilders();
-}
+.resource-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; flex-grow: 1; }
+.resource-scroll::-webkit-scrollbar { display: none; }
+.res-item { background: linear-gradient(180deg, rgba(30,45,70,0.95), rgba(5,10,20,0.98)); border: 1px solid rgba(0,243,255,0.6); border-radius: 8px; padding: 4px 10px; display: flex; align-items: center; gap: 6px; font-family: 'Teko'; font-size: 20px; flex-shrink: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+.res-item img { width: 20px; height: 20px; object-fit: contain; }
 
-// 5. UI UPDATER
-function updateUI() {
-  document.getElementById('ui-gems').innerText = Math.floor(state.resources.gems);
-  document.getElementById('ui-iron').innerText = Math.floor(state.resources.iron);
-  document.getElementById('ui-tita').innerText = Math.floor(state.resources.titanium);
-  document.getElementById('ui-dm').innerText = Math.floor(state.resources.dm);
-  document.getElementById('ui-pc').innerText = Math.floor(state.resources.pc);
-  document.getElementById('ui-cc-level').innerText = state.ccLevel;
-  
-  // Update Builder Text
-  const free = getFreeBuilders();
-  const total = getTotalBuilders();
-  document.getElementById('ui-builder-text').innerText = `${free} / ${total} Free`;
-  
-  // Optional: Colorize builder text if 0 free
-  const bText = document.getElementById('builder-ui');
-  if(free === 0) {
-    bText.style.borderColor = 'var(--magenta)';
-    bText.style.color = 'var(--magenta)';
-  } else {
-    bText.style.borderColor = '#555';
-    bText.style.color = 'var(--gold)';
-  }
+/* Top Row 2 (Build & Builder Buttons) */
+.top-row-2 { display: flex; gap: 10px; align-items: center; }
+.action-btn { background: linear-gradient(180deg, rgba(30,45,70,0.95), rgba(5,10,20,0.98)); border: 1px solid var(--cyan); border-radius: 8px; padding: 6px 15px; display: flex; align-items: center; gap: 8px; color: #fff; font-family: 'Orbitron'; font-size: 12px; font-weight: bold; box-shadow: 0 0 15px rgba(0,243,255,0.3); cursor: pointer; transition: 0.2s; }
+.action-btn:active { transform: scale(0.95); }
+.action-btn img { width: 18px; height: 18px; }
 
-  const container = document.getElementById('building-container');
-  container.innerHTML = '';
-  
-  state.placedBuildings.forEach(b => {
-    const data = gameData.buildings[b.type];
-    let isReady = false;
-    let isUpgrading = b.finishTime && b.finishTime > Date.now();
-    
-    if (data.type === 'miner' && !isUpgrading) {
-      const stats = getMinerStats(b.type, b.level);
-      if (b.currentAmount >= stats.cap) isReady = true;
-    }
+.builder-status { background: rgba(0,0,0,0.8); border: 1px solid #555; padding: 4px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--gold); cursor: pointer; transition: 0.2s; }
+.builder-status:active { transform: scale(0.95); }
 
-    const el = document.createElement('div');
-    el.className = `building-node ${isReady ? 'ready' : ''} ${isUpgrading ? 'upgrading' : ''}`;
-    el.style.left = `${b.x}%`; el.style.top = `${b.y}%`; el.id = b.id;
-    
-    let timerText = '';
-    if(isUpgrading) {
-      const remaining = Math.floor((b.finishTime - Date.now()) / 1000);
-      timerText = `<div class="upgrade-timer" id="timer_${b.id}">🛠️ ${formatTime(remaining)}</div>`;
-    }
+/* ─── MAP & BUILDINGS ─── */
+.screen { position: absolute; inset: 0; display: none; z-index: 10; }
+.screen.active { display: block; animation: fadeIn 0.5s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    el.innerHTML = `${timerText}<img src="assets/${data.img}" class="building-img">`;
-    
-    let isDragging = false, startX, startY;
-    
-    el.addEventListener('pointerdown', (e) => {
-      if (isUpgrading) return;
-      startX = e.clientX; startY = e.clientY;
-      isDragging = false; el.classList.add('dragging');
-      el.setPointerCapture(e.pointerId);
-    });
+.base-map { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: -1; overflow: hidden; touch-action: none; }
+.map-grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,243,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; }
 
-    el.addEventListener('pointermove', (e) => {
-      if (!el.hasPointerCapture(e.pointerId) || isUpgrading) return;
-      if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) {
-        isDragging = true;
-        const mapRect = document.getElementById('base-map').getBoundingClientRect();
-        let newX = ((e.clientX - mapRect.left) / mapRect.width) * 100;
-        let newY = ((e.clientY - mapRect.top) / mapRect.height) * 100;
-        newX = Math.max(5, Math.min(95, newX)); newY = Math.max(5, Math.min(95, newY));
-        el.style.left = `${newX}%`; el.style.top = `${newY}%`; b.x = newX; b.y = newY;
-      }
-    });
+.building-node { position: absolute; width: 110px; height: 110px; display: flex; justify-content: center; align-items: center; cursor: grab; z-index: 10; transform: translate(-50%, -50%); touch-action: none; }
+.building-node:active { cursor: grabbing; z-index: 20; }
+.building-img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8)); transition: filter 0.2s; }
+.building-node.dragging .building-img { filter: drop-shadow(0 0 20px var(--cyan)) brightness(1.5); }
 
-    el.addEventListener('pointerup', (e) => {
-      el.classList.remove('dragging'); el.releasePointerCapture(e.pointerId);
-      if (isDragging) saveGame(); else openBuildingModal(b);
-    });
+/* Upgrading Visuals */
+.building-node.upgrading .building-img { filter: grayscale(50%) brightness(0.7); }
+.upgrade-timer { position: absolute; top: -15px; background: rgba(0,0,0,0.9); border: 1px solid var(--magenta); padding: 2px 8px; border-radius: 10px; font-family: 'Teko'; font-size: 14px; color: var(--magenta); box-shadow: 0 0 10px rgba(255,0,255,0.5); display: none; z-index: 30; }
+.building-node.upgrading .upgrade-timer { display: block; animation: pulseMagenta 2s infinite; }
+@keyframes pulseMagenta { 0%, 100% { box-shadow: 0 0 5px var(--magenta); } 50% { box-shadow: 0 0 15px var(--magenta); } }
 
-    container.appendChild(el);
-  });
-}
+.building-node.ready { animation: bounceReady 1s infinite alternate; }
+@keyframes bounceReady { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -55%) scale(1.05); filter: drop-shadow(0 0 15px #00ff88); } }
 
-// 6. MODAL LOGIC
-let currentSelectedBuildingId = null;
+/* ─── RIGHT NAV DOCK (Bigger Icons) ─── */
+.nav-dock { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: rgba(5, 10, 20, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(0,243,255,0.2); border-radius: 35px; padding: 20px 8px; z-index: 100; }
+.side-nav { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; background: transparent; border: none; color: #667; font-family: 'Orbitron'; font-size: 9px; }
+.nav-icon { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, rgba(20,35,55,0.9), rgba(5,10,20,0.95)); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: 0.3s; }
+.nav-icon img { width: 35px; height: 35px; filter: grayscale(100%) brightness(0.7); transition: 0.3s; }
+.nav-item.active { color: var(--cyan); }
+.nav-item.active .nav-icon { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,243,255,0.6); transform: scale(1.05); background: rgba(0,243,255,0.1); }
+.nav-item.active .nav-icon img { filter: grayscale(0%) drop-shadow(0 0 8px var(--cyan)); }
 
-function openBuildingModal(building) {
-  currentSelectedBuildingId = building.id;
-  const data = gameData.buildings[building.type];
-  const isUpgrading = building.finishTime && building.finishTime > Date.now();
-  
-  document.getElementById('b-modal-title').innerText = data.name;
-  document.getElementById('b-modal-img').src = `assets/${data.img}`;
-  document.getElementById('b-modal-level').innerText = building.level;
-  
-  const statLabel = document.getElementById('b-modal-stat-label');
-  const statVal = document.getElementById('b-modal-stat-val');
-  const upgradeInfo = document.getElementById('b-modal-upgrade-info');
-  const storageRow = document.getElementById('b-modal-storage-row');
-  const timeRow = document.getElementById('b-modal-time-row');
-  const claimBtn = document.getElementById('btn-claim');
-  const btnUpgrade = document.getElementById('btn-upgrade');
+/* ─── MODALS ─── */
+.modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+.modal-content { background: var(--glass); border: 2px solid var(--cyan); padding: 20px; border-radius: 12px; text-align: center; width: 90%; max-width: 350px; max-height: 85vh; overflow-y: auto; box-shadow: 0 0 40px rgba(0,243,255,0.2); animation: popIn 0.3s ease-out; }
+@keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.glow-cyan { font-family: 'Orbitron'; color: #fff; text-shadow: 0 0 10px var(--cyan); margin-bottom: 15px; font-size: 18px; }
+.modal-img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 0 15px rgba(0,243,255,0.6)); }
 
-  if (data.type === 'miner') {
-    const stats = getMinerStats(building.type, building.level);
-    statLabel.innerText = "Production:";
-    statVal.innerText = `${stats.rate.toFixed(1)} / min`;
-    storageRow.style.display = 'flex';
-    document.getElementById('b-modal-storage').innerText = `${Math.floor(building.currentAmount)} / ${stats.cap}`;
-    claimBtn.style.display = isUpgrading ? 'none' : 'block';
-    claimBtn.innerText = `CLAIM ${data.res.toUpperCase()}`;
-    
-    if(building.level < 15) {
-      const nextStats = getMinerStats(building.type, building.level + 1);
-      upgradeInfo.style.display = 'block';
-      document.getElementById('next-stat-val').innerText = `${nextStats.rate.toFixed(1)} / min (Cap: ${nextStats.cap})`;
-    } else upgradeInfo.style.display = 'none';
-  } else {
-    statLabel.innerText = "Type:";
-    statVal.innerText = data.type ? data.type.toUpperCase() : 'Utility';
-    storageRow.style.display = 'none'; claimBtn.style.display = 'none'; upgradeInfo.style.display = 'none';
-  }
+/* Building Stats inside Modal */
+.building-stats { background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+.stat-row { display: flex; justify-content: space-between; font-family: 'Teko'; font-size: 18px; color: var(--gold); margin-bottom: 5px; }
 
-  if (isUpgrading) {
-    timeRow.style.display = 'flex';
-    document.getElementById('b-modal-time').innerText = formatTime(Math.floor((building.finishTime - Date.now()) / 1000));
-    document.getElementById('b-modal-cost-container').style.display = 'none';
-    btnUpgrade.style.display = 'none';
-  } else {
-    timeRow.style.display = 'none'; document.getElementById('b-modal-cost-container').style.display = 'block'; btnUpgrade.style.display = 'block';
-    
-    if (building.level >= 15) {
-      document.getElementById('b-modal-costs').innerHTML = `<span style="color:var(--gold);">MAX LEVEL REACHED</span>`;
-      btnUpgrade.style.display = 'none';
-    } else {
-      const cost = getUpgradeCost(building.type, building.level);
-      const timeReq = getUpgradeTime(building.type, building.level);
-      
-      let costHtml = '';
-      if(cost.iron > 0) costHtml += `<div class="cost-item"><img src="assets/icon_iron.png"> ${cost.iron}</div>`;
-      if(cost.tita > 0) costHtml += `<div class="cost-item"><img src="assets/icon_titanium.png"> ${cost.tita}</div>`;
-      if(cost.dm > 0) costHtml += `<div class="cost-item"><img src="assets/icon_dm.png"> ${cost.dm}</div>`;
-      if(cost.pc > 0) costHtml += `<div class="cost-item"><img src="assets/icon_pc.png"> ${cost.pc}</div>`;
-      if(cost.gems > 0) costHtml += `<div class="cost-item"><img src="assets/icon_gem.png"> ${cost.gems}</div>`;
-      
-      document.getElementById('b-modal-costs').innerHTML = costHtml;
-      timeRow.style.display = 'flex';
-      document.getElementById('b-modal-time').innerText = formatTime(timeReq);
-      
-      // Show builder status in button
-      if(getFreeBuilders() <= 0) {
-        btnUpgrade.innerText = "NO FREE BUILDERS";
-        btnUpgrade.style.opacity = '0.5';
-      } else {
-        btnUpgrade.innerText = "UPGRADE";
-        btnUpgrade.style.opacity = '1';
-      }
-    }
-  }
-  document.getElementById('building-modal').style.display = 'flex';
-}
+/* Buttons */
+.btn { width: 100%; padding: 12px; font-family: 'Orbitron'; font-size: 14px; font-weight: bold; border: none; cursor: pointer; border-radius: 6px; margin-bottom: 10px; text-transform: uppercase; transition: 0.2s; }
+.btn:active { transform: scale(0.95); }
+.btn-cyan { background: linear-gradient(180deg, #005b66, #001f24); color: var(--cyan); border: 1px solid var(--cyan); box-shadow: 0 0 15px rgba(0,243,255,0.3); }
+.btn-magenta { background: linear-gradient(180deg, #660066, #240024); color: var(--magenta); border: 1px solid var(--magenta); box-shadow: 0 0 15px rgba(255,0,255,0.3); }
+.btn-cancel { background: rgba(255,255,255,0.05); color: #888; border: 1px solid #333; }
 
-// 7. CLAIM
-function claimResources() {
-  const building = state.placedBuildings.find(b => b.id === currentSelectedBuildingId);
-  if(building.finishTime && building.finishTime > Date.now()) return;
-  const data = gameData.buildings[building.type];
-  const resType = data.res;
-  let amount = building.currentAmount;
-  if (amount <= 0) { alert("Miner is empty!"); return; }
+/* Build Grid */
+.build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+.build-card { background: rgba(0,0,0,0.6); border: 1px solid #444; border-radius: 8px; padding: 10px 5px; text-align: center; cursor: pointer; position: relative; transition: 0.2s; }
+.build-card:active { transform: scale(0.95); }
+.build-card img { width: 50px; height: 50px; object-fit: contain; }
+.build-card p { font-size: 10px; margin-top: 5px; color: #ccc; font-family: 'Orbitron'; }
+.build-card.locked { opacity: 0.5; cursor: not-allowed; }
+.lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #ff4444; font-size: 12px; font-weight: bold; }
 
-  const currentGlobal = state.resources[resType];
-  const cap = gameData.storage[resType]; 
-  if (currentGlobal >= cap) { alert("Main Storage is full!"); return; }
+/* Upgrade Costs */
+.upgrade-costs { margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; border: 1px dashed var(--gold); }
+.cost-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.cost-item { display: flex; align-items: center; gap: 4px; font-family: 'Teko'; font-size: 16px; color: #fff; }
+.cost-item img { width: 16px; height: 16px; }
 
-  let newTotal = currentGlobal + amount;
-  if (newTotal > cap) { amount = cap - currentGlobal; newTotal = cap; }
-
-  state.resources[resType] = newTotal;
-  building.currentAmount -= amount;
-  saveGame(); updateUI(); closeModals();
-  if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-}
-
-// 8. UPGRADE (With Builder Check)
-function upgradeBuilding() {
-  const building = state.placedBuildings.find(b => b.id === currentSelectedBuildingId);
-  if (building.level >= 15) return;
-
-  // Check Builders
-  if(getFreeBuilders() <= 0) {
-    alert("All builders are busy! Wait for them to finish or buy a Cyber Pass.");
-    return;
-  }
-
-  if (building.type === 'cc') {
-    const notMaxed = state.placedBuildings.some(b => b.type !== 'cc' && b.level < state.ccLevel);
-    if (notMaxed) { alert("Upgrade all other buildings to your current CC level first!"); return; }
-  } else {
-    if (building.level >= state.ccLevel) { alert("Upgrade your Command Center first!"); return; }
-  }
-
-  const cost = getUpgradeCost(building.type, building.level);
-  if (state.resources.iron >= cost.iron && state.resources.titanium >= cost.tita && state.resources.dm >= cost.dm && state.resources.pc >= cost.pc && state.resources.gems >= cost.gems) {
-    state.resources.iron -= cost.iron; state.resources.titanium -= cost.tita; state.resources.dm -= cost.dm;
-    state.resources.pc -= cost.pc; state.resources.gems -= cost.gems;
-    
-    const timeReq = getUpgradeTime(building.type, building.level);
-    building.finishTime = Date.now() + (timeReq * 1000);
-    
-    // Automatically use Cyber Builder if active, else normal builder
-    // (Our logic just counts total busy vs total available, so it works automatically)
-
-    saveGame(); updateUI(); closeModals();
-    if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
-  } else {
-    alert("Not enough resources!");
-  }
-}
-
-// 9. BUILD MENU
-function openBuildMenu() {
-  const grid = document.getElementById('build-grid');
-  grid.innerHTML = '';
-  
-  for (let type in gameData.buildings) {
-    const data = gameData.buildings[type];
-    const currentCount = state.placedBuildings.filter(b => b.type === type).length;
-    const isMaxed = currentCount >= data.maxAllowed;
-    const isUnlocked = state.ccLevel >= data.unlockLvl;
-    
-    let card = document.createElement('div');
-    card.className = `build-card ${(!isUnlocked) ? 'locked' : ''}`;
-    card.innerHTML = `
-      <img src="assets/${data.img}">
-      <p>${data.name}</p>
-      <p style="font-size:9px; color:${isMaxed ? 'var(--magenta)' : 'var(--gold)'};">${currentCount}/${data.maxAllowed}</p>
-      ${!isUnlocked ? `<div class="lock-overlay"><span>🔒 CC Lvl ${data.unlockLvl}</span></div>` : ''}
-    `;
-    
-    if (isUnlocked && !isMaxed) {
-      card.onclick = () => {
-        const newX = 20 + Math.random() * 60;
-        const newY = 20 + Math.random() * 60;
-        const newB = { id: 'b_' + Date.now(), type: type, level: 1, x: newX, y: newY, currentAmount: 0 };
-        const cost = getUpgradeCost(type, 0);
-        
-        if (state.resources.iron >= cost.iron && state.resources.gems >= cost.gems) {
-           state.resources.iron -= cost.iron; state.resources.gems -= cost.gems;
-           state.placedBuildings.push(newB);
-           saveGame(); updateUI(); closeModals();
-           if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-        } else { alert("Not enough resources!"); }
-      };
-    } else if (isMaxed) {
-      card.onclick = () => alert("You have reached the maximum limit for this building!");
-    }
-    grid.appendChild(card);
-  }
-  document.getElementById('build-menu-modal').style.display = 'flex';
-}
-
-function closeModals() {
-  document.getElementById('build-menu-modal').style.display = 'none';
-  document.getElementById('building-modal').style.display = 'none';
-}
-
-// 10. GAME LOOP
-setInterval(() => {
-  let changed = false;
-  const now = Date.now();
-
-  state.placedBuildings.forEach(b => {
-    const data = gameData.buildings[b.type];
-    if (b.finishTime && now >= b.finishTime) {
-      b.level++; b.finishTime = null;
-      if (b.type === 'cc') {
-        state.ccLevel = b.level;
-        if(state.ccLevel === 5) {
-          state.buildersTotal = 2;
-          alert("Congratulations! Level 5 Reached. 2nd Builder Unlocked!");
-        }
-        if(state.ccLevel === 10) {
-          state.buildersTotal = 3;
-          alert("Congratulations! Level 10 Reached. 3rd Builder Unlocked!");
-        }
-      }
-      changed = true;
-    }
-    if (data.type === 'miner' && !b.finishTime) {
-      const stats = getMinerStats(b.type, b.level);
-      if (b.currentAmount < stats.cap) {
-        b.currentAmount += (stats.rate / 60);
-        if (b.currentAmount > stats.cap) b.currentAmount = stats.cap;
-        changed = true;
-      }
-    }
-  });
-
-  if (!changed) {
-    state.placedBuildings.forEach(b => {
-      if (b.finishTime) {
-        const el = document.getElementById(`timer_${b.id}`);
-        if (el) {
-          const rem = Math.floor((b.finishTime - now) / 1000);
-          if (rem > 0) el.innerHTML = `🛠️ ${formatTime(rem)}`;
-        }
-      }
-    });
-  }
-  if (changed) { saveGame(); updateUI(); }
-}, 1000);
-
-// 11. MISC
-window.onload = () => {
-  setTimeout(() => { document.getElementById('loading').classList.add('hide'); }, 1500);
-  if (!localStorage.getItem('has_claimed_bonus')) {
-    document.getElementById('signup-modal').style.display = 'flex';
-  } else {
-    updateUI();
-  }
-};
-
-function claimSignupBonus() {
-  state.resources.gems += 100; state.resources.iron += 100000; state.resources.titanium += 10000;
-  state.resources.dm += 100; state.resources.pc += 10;
-  localStorage.setItem('has_claimed_bonus', 'true');
-  saveGame(); updateUI();
-  document.getElementById('signup-modal').style.display = 'none';
-}
-
-function showBuilderInfo() {
-  alert(`Available Builders: ${getFreeBuilders()} / ${getTotalBuilders()}\n\nBuilders are required to upgrade buildings.\n\nCyber Pass can provide a temporary extra builder.`);
-}
+/* Signup Bonus Grid */
+.bonus-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; }
+.bonus-item { background: rgba(0,0,0,0.5); border: 1px solid #555; padding: 5px 10px; border-radius: 8px; display: flex; align-items: center; gap: 5px; font-family: 'Teko'; font-size: 18px; color: var(--gold); }
+.bonus-item img { width: 20px; height: 20px; }
