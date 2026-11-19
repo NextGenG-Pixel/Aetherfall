@@ -1,3 +1,6 @@
+// FORCE CLEAR ALL OLD SAVED DATA (Fixes Cache Issue)
+localStorage.clear();
+
 // 1. GAME DATABASE
 const gameData = {
   storage: { iron: 100000, titanium: 50000, dm: 5000, pc: 500, gems: 999999 },
@@ -22,8 +25,7 @@ const gameData = {
   }
 };
 
-// 2. STATE (Fresh State Every Time)
-// NOTE: localStorage removed so it starts fresh on every refresh during testing.
+// 2. STATE
 let state = {
   ccLevel: 1,
   resources: { gems: 500, iron: 15000, titanium: 2000, dm: 100, pc: 10 },
@@ -404,11 +406,11 @@ setInterval(() => {
   if (changed) { saveGame(); updateUI(); }
 }, 1000);
 
-// 11. ON LOAD (Always show signup bonus on fresh load)
+// 11. ON LOAD 
 window.onload = () => {
   setTimeout(() => { document.getElementById('loading').classList.add('hide'); }, 1500);
   
-  // Show Signup Modal every time because localStorage is removed
+  // Always show signup modal
   document.getElementById('signup-modal').style.display = 'flex';
 };
 
@@ -416,7 +418,6 @@ function claimSignupBonus() {
   state.resources.gems += 100; state.resources.iron += 100000; state.resources.titanium += 10000;
   state.resources.dm += 100; state.resources.pc += 10;
   
-  // Removed localStorage check
   updateUI();
   document.getElementById('signup-modal').style.display = 'none';
 }
