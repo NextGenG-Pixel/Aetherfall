@@ -1,7 +1,7 @@
 // FORCE CLEAR ALL OLD SAVED DATA
 localStorage.clear();
 
-// 1. GAME DATABASE (Final Exact Math)
+// 1. GAME DATABASE
 const gameData = {
   storage: { iron: 7200000, titanium: 2800000, dm: 580000, pc: 28000, gems: 999999 },
   buildings: {
@@ -41,7 +41,7 @@ let state = {
 
 function saveGame() { }
 
-// 3. UTILITIES
+// 3. UTILITIES (Fixed Time Math)
 function getUpgradeCost(type, currentLevel) {
   const base = gameData.buildings[type].baseCost;
   const multiplier = Math.pow(1.5, currentLevel - 1); 
@@ -52,9 +52,10 @@ function getUpgradeCost(type, currentLevel) {
 }
 
 function getUpgradeTime(type, level) {
-  const baseTime = 5; 
-  let time = baseTime * Math.pow(1.6, level - 1);
-  if (type === 'cc') time *= 2;
+  // Base time 30s for level 1. Increases by 1.7x per level.
+  const baseTime = 30; 
+  let time = baseTime * Math.pow(1.7, level - 1);
+  if (type === 'cc') time *= 1.5; // CC takes slightly longer
   return Math.floor(time);
 }
 
@@ -82,9 +83,7 @@ function getTotalBuilders() {
   if (state.hasCyberBuilder && state.cyberBuilderExpiry > Date.now()) total += 1;
   return total;
 }
-function getBusyBuilders() {
-  return state.placedBuildings.filter(b => b.finishTime && b.finishTime > Date.now()).length;
-}
+function getBusyBuilders() { return state.placedBuildings.filter(b => b.finishTime && b.finishTime > Date.now()).length; }
 function getFreeBuilders() { return getTotalBuilders() - getBusyBuilders(); }
 
 // 5. UI UPDATER
@@ -112,13 +111,15 @@ function updateUI() {
     let isReady = false;
     let isUpgrading = b.finishTime && b.finishTime > Date.now();
     
+    let hasResources = false;
     if (data.type === 'miner' && !isUpgrading) {
       const stats = getMinerStats(b.type, b.level);
       if (b.currentAmount >= stats.cap) isReady = true;
+      if (b.currentAmount > 0) hasResources = true;
     }
 
     const el = document.createElement('div');
-    el.className = `building-node ${isReady ? 'ready' : ''} ${isUpgrading ? 'upgrading' : ''}`;
+    el.className = `building-node ${isReady ? 'ready' : ''} ${isUpgrading ? 'upgrading' : ''} ${hasResources ? 'has-resources' : ''}`;
     el.style.left = `${b.x}%`; el.style.top = `${b.y}%`; el.id = b.id;
     
     let timerText = '';
@@ -127,8 +128,26 @@ function updateUI() {
       timerText = `<div class="upgrade-timer" id="timer_${b.id}">🛠️ ${formatTime(remaining)}</div>`;
     }
 
-    el.innerHTML = `${timerText}<img src="assets/${data.img}" class="building-img">`;
+    // Add Idle Animation Class based on Type
+    let idleClass = '';
+    if(data.type === 'miner') idleClass = 'idle-miner';
+    else if(b.type === 'lab') idleClass = 'idle-lab';
+    else if(b.type === 'cc') idleClass = 'idle-cc';
+
+    // Claim Indicator (Floating button)
+    let claimIconHtml = '';
+    if (data.type === 'miner' && hasResources && !isUpgrading) {
+      const resIcon = `assets/icon_${data.res}.png`;
+      claimIconHtml = `<div class="claim-indicator" onclick="event.stopPropagation(); claimDirect('${b.id}', this)"><img src="${resIcon}"></div>`;
+    }
+
+    el.innerHTML = `
+      ${timerText}
+      ${claimIconHtml}
+      <img src="assets/${data.img}" class="building-img ${idleClass}">
+    `;
     
+    // ... (Drag and Drop Logic Same as before)
     let isDragging = false, startX, startY, movedDist = 0;
     
     el.addEventListener('pointerdown', (e) => {
@@ -141,12 +160,11 @@ function updateUI() {
 
     el.addEventListener('pointermove', (e) => {
       if (!el.hasPointerCapture(e.pointerId) || isUpgrading) return;
-      
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
       movedDist = Math.sqrt(dx*dx + dy*dy);
 
-      if (movedDist > 15) { // Threshold for drag
+      if (movedDist > 15) {
         isDragging = true;
         const mapRect = document.getElementById('base-map').getBoundingClientRect();
         let newX = ((e.clientX - mapRect.left) / mapRect.width) * 100;
@@ -159,9 +177,8 @@ function updateUI() {
     el.addEventListener('pointerup', (e) => {
       el.classList.remove('dragging'); el.releasePointerCapture(e.pointerId);
       if (isDragging) {
-        saveGame(); // Just save position
+        saveGame(); 
       } else {
-        // It was a click (movedDist < 15)
         openBuildingModal(b);
       }
     });
@@ -170,7 +187,7 @@ function updateUI() {
   });
 }
 
-// 6. MODAL LOGIC
+// 6. MODAL LOGIC (Same as before)
 let currentSelectedBuildingId = null;
 
 function openBuildingModal(building) {
@@ -248,10 +265,10 @@ function openBuildingModal(building) {
   document.getElementById('building-modal').style.display = 'flex';
 }
 
-// 7. CLAIM
+// 7. CLAIM (Modal & Direct)
 function claimResources() {
   const building = state.placedBuildings.find(b => b.id === currentSelectedBuildingId);
-  if(building.finishTime && building.finishTime > Date.now()) return;
+  if(!building || (building.finishTime && building.finishTime > Date.now())) return;
   const data = gameData.buildings[building.type];
   const resType = data.res;
   let amount = building.currentAmount;
@@ -270,7 +287,66 @@ function claimResources() {
   if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
 }
 
-// 8. UPGRADE (With Animation)
+// NEW: Direct Claim from floating button + Flying Animation
+window.claimDirect = function(buildingId, indicatorEl) {
+  const building = state.placedBuildings.find(b => b.id === buildingId);
+  if(!building) return;
+  
+  const data = gameData.buildings[building.type];
+  const resType = data.res;
+  let amount = building.currentAmount;
+  const currentGlobal = state.resources[resType];
+  const cap = gameData.storage[resType]; 
+  
+  if (currentGlobal >= cap) { alert("Main Storage is full!"); return; }
+  if (amount <= 0) return;
+
+  let newTotal = currentGlobal + amount;
+  if (newTotal > cap) { amount = cap - currentGlobal; newTotal = cap; }
+
+  state.resources[resType] = newTotal;
+  building.currentAmount -= amount;
+  
+  // Animation
+  flyResourceToHUD(indicatorEl, `assets/icon_${resType}.png`, `hud-${resType}`);
+  
+  saveGame(); updateUI(); // Updates the DOM, removing the indicator
+  
+  if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+}
+
+function flyResourceToHUD(startEl, imgSrc, targetId) {
+  const startRect = startEl.getBoundingClientRect();
+  const targetRect = document.getElementById(targetId).getBoundingClientRect();
+  
+  // Create flying image
+  const flyImg = document.createElement('img');
+  flyImg.src = imgSrc;
+  flyImg.className = 'flying-resource';
+  flyImg.style.left = `${startRect.left}px`;
+  flyImg.style.top = `${startRect.top}px`;
+  
+  document.getElementById('flying-container').appendChild(flyImg);
+  
+  // Trigger reflow to apply initial styles
+  void flyImg.offsetWidth;
+  
+  // Move to target
+  flyImg.style.left = `${targetRect.left + (targetRect.width/2) - 14}px`;
+  flyImg.style.top = `${targetRect.top + 5}px`;
+  flyImg.classList.add('end');
+  
+  // Remove after animation
+  setTimeout(() => {
+    flyImg.remove();
+    // Bump the HUD element
+    const hudEl = document.getElementById(targetId);
+    hudEl.style.transform = 'scale(1.2)';
+    setTimeout(() => hudEl.style.transform = 'scale(1)', 150);
+  }, 800);
+}
+
+// 8. UPGRADE (Same as before, just time fix applied)
 function upgradeBuilding() {
   const building = state.placedBuildings.find(b => b.id === currentSelectedBuildingId);
   if (building.level >= 15) return;
@@ -309,7 +385,7 @@ function upgradeBuilding() {
   }
 }
 
-// 9. BUILD MENU
+// 9, 10, 11 (Build Menu, Close Modals, Complete Card, Game Loop) - Same as before
 function openBuildMenu() {
   const grid = document.getElementById('build-grid');
   grid.innerHTML = '';
@@ -354,7 +430,6 @@ function closeModals() {
   document.getElementById('building-modal').style.display = 'none';
 }
 
-// 10. SHOW UPGRADE COMPLETE CARD
 function showUpgradeComplete(building) {
   const data = gameData.buildings[building.type];
   document.getElementById('uc-title').innerText = data.name;
@@ -379,7 +454,6 @@ function closeUpgradeComplete() {
   document.getElementById('upgrade-complete-modal').style.display = 'none';
 }
 
-// 11. GAME LOOP (Handles Timer Finish)
 setInterval(() => {
   let changed = false;
   const now = Date.now();
@@ -387,7 +461,6 @@ setInterval(() => {
   state.placedBuildings.forEach(b => {
     const data = gameData.buildings[b.type];
     
-    // Check if upgrade finished
     if (b.finishTime && now >= b.finishTime) {
       b.level++; b.finishTime = null;
       
@@ -397,20 +470,16 @@ setInterval(() => {
         if(state.ccLevel === 10) state.buildersTotal = 3;
       }
       
-      // Trigger Animation
       const el = document.getElementById(b.id);
       if(el) {
         el.classList.add('upgrade-finish-anim');
         setTimeout(() => el.classList.remove('upgrade-finish-anim'), 1500);
       }
 
-      // Show Upgrade Complete Card
       showUpgradeComplete(b);
-      
       changed = true;
     }
     
-    // Mine resources
     if (data.type === 'miner' && !b.finishTime) {
       const stats = getMinerStats(b.type, b.level);
       if (b.currentAmount < stats.cap) {
@@ -435,7 +504,6 @@ setInterval(() => {
   if (changed) { saveGame(); updateUI(); }
 }, 1000);
 
-// 12. ON LOAD 
 window.onload = () => {
   setTimeout(() => { document.getElementById('loading').classList.add('hide'); }, 1500);
   document.getElementById('signup-modal').style.display = 'flex';
