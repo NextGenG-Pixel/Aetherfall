@@ -41,21 +41,17 @@ let state = {
 
 function saveGame() { }
 
-// 3. UTILITIES (Fixed Time Math)
+// 3. UTILITIES
 function getUpgradeCost(type, currentLevel) {
   const base = gameData.buildings[type].baseCost;
   const multiplier = Math.pow(1.5, currentLevel - 1); 
-  return {
-    iron: Math.floor(base.iron * multiplier), tita: Math.floor(base.tita * multiplier),
-    dm: Math.floor(base.dm * multiplier), pc: Math.floor(base.pc * multiplier), gems: Math.floor(base.gems * multiplier)
-  };
+  return { iron: Math.floor(base.iron * multiplier), tita: Math.floor(base.tita * multiplier), dm: Math.floor(base.dm * multiplier), pc: Math.floor(base.pc * multiplier), gems: Math.floor(base.gems * multiplier) };
 }
 
 function getUpgradeTime(type, level) {
-  // Base time 30s for level 1. Increases by 1.7x per level.
   const baseTime = 30; 
   let time = baseTime * Math.pow(1.7, level - 1);
-  if (type === 'cc') time *= 1.5; // CC takes slightly longer
+  if (type === 'cc') time *= 1.5; 
   return Math.floor(time);
 }
 
@@ -121,6 +117,7 @@ function updateUI() {
     const el = document.createElement('div');
     el.className = `building-node ${isReady ? 'ready' : ''} ${isUpgrading ? 'upgrading' : ''} ${hasResources ? 'has-resources' : ''}`;
     el.style.left = `${b.x}%`; el.style.top = `${b.y}%`; el.id = b.id;
+    el.dataset.type = b.type; // For CC / Lab targeting
     
     let timerText = '';
     if(isUpgrading) {
@@ -128,17 +125,15 @@ function updateUI() {
       timerText = `<div class="upgrade-timer" id="timer_${b.id}">🛠️ ${formatTime(remaining)}</div>`;
     }
 
-    // Add Idle Animation Class based on Type
     let idleClass = '';
     if(data.type === 'miner') idleClass = 'idle-miner';
     else if(b.type === 'lab') idleClass = 'idle-lab';
     else if(b.type === 'cc') idleClass = 'idle-cc';
 
-    // Claim Indicator (Floating button)
     let claimIconHtml = '';
     if (data.type === 'miner' && hasResources && !isUpgrading) {
       const resIcon = `assets/icon_${data.res}.png`;
-      claimIconHtml = `<div class="claim-indicator" onclick="event.stopPropagation(); claimDirect('${b.id}', this)"><img src="${resIcon}"></div>`;
+      claimIconHtml = `<div class="claim-indicator"><img src="${resIcon}"></div>`;
     }
 
     el.innerHTML = `
@@ -147,11 +142,11 @@ function updateUI() {
       <img src="assets/${data.img}" class="building-img ${idleClass}">
     `;
     
-    // ... (Drag and Drop Logic Same as before)
     let isDragging = false, startX, startY, movedDist = 0;
     
     el.addEventListener('pointerdown', (e) => {
       if (isUpgrading) return;
+      if (e.target.closest('.claim-indicator')) return; // Ignore drag if clicking indicator
       startX = e.clientX; startY = e.clientY;
       isDragging = false; movedDist = 0;
       el.classList.add('dragging');
@@ -179,6 +174,13 @@ function updateUI() {
       if (isDragging) {
         saveGame(); 
       } else {
+        // It was a click
+        if (e.target.closest('.claim-indicator')) {
+           // Claim indicator was clicked, handle it directly here to avoid bubbling issues
+           const indicator = e.target.closest('.claim-indicator');
+           claimDirect(b.id, indicator);
+           return;
+        }
         openBuildingModal(b);
       }
     });
@@ -187,7 +189,7 @@ function updateUI() {
   });
 }
 
-// 6. MODAL LOGIC (Same as before)
+// 6. MODAL LOGIC
 let currentSelectedBuildingId = null;
 
 function openBuildingModal(building) {
@@ -287,7 +289,7 @@ function claimResources() {
   if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
 }
 
-// NEW: Direct Claim from floating button + Flying Animation
+// Direct Claim from floating button + Flying Animation
 window.claimDirect = function(buildingId, indicatorEl) {
   const building = state.placedBuildings.find(b => b.id === buildingId);
   if(!building) return;
@@ -305,48 +307,46 @@ window.claimDirect = function(buildingId, indicatorEl) {
   if (newTotal > cap) { amount = cap - currentGlobal; newTotal = cap; }
 
   state.resources[resType] = newTotal;
-  building.currentAmount -= amount;
+  building.currentAmount = 0; // Clear completely
   
-  // Animation
-  flyResourceToHUD(indicatorEl, `assets/icon_${resType}.png`, `hud-${resType}`);
+  // Start Flying Animation from indicator to HUD
+  const startRect = indicatorEl.getBoundingClientRect();
+  const targetRect = document.getElementById(`hud-${resType}`).getBoundingClientRect();
   
-  saveGame(); updateUI(); // Updates the DOM, removing the indicator
+  // Update HUD number silently
+  document.getElementById(`ui-${resType}`).innerText = Math.floor(state.resources[resType]);
+
+  // Remove indicator instantly
+  indicatorEl.remove();
+
+  // Fly Animation
+  const flyImg = document.createElement('img');
+  flyImg.src = `assets/icon_${resType}.png`;
+  flyImg.className = 'flying-resource';
+  flyImg.style.left = `${startRect.left}px`;
+  flyImg.style.top = `${startRect.top}px`;
+  document.getElementById('flying-container').appendChild(flyImg);
+  
+  void flyImg.offsetWidth;
+  
+  flyImg.style.left = `${targetRect.left + (targetRect.width / 2) - 16}px`;
+  flyImg.style.top = `${targetRect.top + 5}px`;
+  flyImg.classList.add('end');
+  
+  setTimeout(() => {
+    flyImg.remove();
+    const hudEl = document.getElementById(`hud-${resType}`);
+    hudEl.style.transform = 'scale(1.2)';
+    setTimeout(() => hudEl.style.transform = 'scale(1)', 150);
+    
+    // Rebuild UI after animation to reset states
+    saveGame(); updateUI();
+  }, 800);
   
   if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
 }
 
-function flyResourceToHUD(startEl, imgSrc, targetId) {
-  const startRect = startEl.getBoundingClientRect();
-  const targetRect = document.getElementById(targetId).getBoundingClientRect();
-  
-  // Create flying image
-  const flyImg = document.createElement('img');
-  flyImg.src = imgSrc;
-  flyImg.className = 'flying-resource';
-  flyImg.style.left = `${startRect.left}px`;
-  flyImg.style.top = `${startRect.top}px`;
-  
-  document.getElementById('flying-container').appendChild(flyImg);
-  
-  // Trigger reflow to apply initial styles
-  void flyImg.offsetWidth;
-  
-  // Move to target
-  flyImg.style.left = `${targetRect.left + (targetRect.width/2) - 14}px`;
-  flyImg.style.top = `${targetRect.top + 5}px`;
-  flyImg.classList.add('end');
-  
-  // Remove after animation
-  setTimeout(() => {
-    flyImg.remove();
-    // Bump the HUD element
-    const hudEl = document.getElementById(targetId);
-    hudEl.style.transform = 'scale(1.2)';
-    setTimeout(() => hudEl.style.transform = 'scale(1)', 150);
-  }, 800);
-}
-
-// 8. UPGRADE (Same as before, just time fix applied)
+// 8. UPGRADE
 function upgradeBuilding() {
   const building = state.placedBuildings.find(b => b.id === currentSelectedBuildingId);
   if (building.level >= 15) return;
@@ -385,7 +385,7 @@ function upgradeBuilding() {
   }
 }
 
-// 9, 10, 11 (Build Menu, Close Modals, Complete Card, Game Loop) - Same as before
+// 9. BUILD MENU & LOOP
 function openBuildMenu() {
   const grid = document.getElementById('build-grid');
   grid.innerHTML = '';
